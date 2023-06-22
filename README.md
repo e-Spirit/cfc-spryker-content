@@ -38,7 +38,10 @@ and then:
 // ----------- FirstSpirit Preview CaaS Configuration
 $config[FirstSpiritPreviewCaaSConstants::FIRSTSPIRIT_PREVIEW_CAAS_SCRIPT_URL] = '<ADD CaaS Endpoint HOST (without parameters)>';
 ```
-
+for local url the value can be:
+```
+http://host.docker.internal:3001/api/findPage
+```
 
 **Add namespace in Yves TwigDependencyProvider**
 
@@ -53,12 +56,13 @@ new FirstSpiritPreviewCaaSDataTwigPlugin(),
 
 **Add twig variable in Main page > page-layout-main.twig**
 
-Add the following to your `src/Pyz/Yves/ShopUi/Theme/default/templates/page-layout-main/page-layout-main.twig` file at the end of the document
+Add the following to your `src/Pyz/Yves/ShopUi/Theme/default/templates/page-layout-main/page-layout-main.twig` file, like this:
+
+***Note:** this is temporary!*
 ```
-{% block footerScripts %}
-    {{ parent() }}
-    {{ firstSpiritCfcScriptUrl|raw }}
-{% endblock %}
+{% block body %}
+    {{ dump(firstSpiritCfcCaaSScriptData) }}
+    ...
 ```
 
 ## Testing
