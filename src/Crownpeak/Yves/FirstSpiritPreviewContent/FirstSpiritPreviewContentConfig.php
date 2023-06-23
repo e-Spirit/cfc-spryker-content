@@ -2,7 +2,7 @@
 namespace Crownpeak\Yves\FirstSpiritPreviewContent;
 
 use Spryker\Yves\Kernel\AbstractBundleConfig;
-use Crownpeak\Shared\FirstSpiritPreviewContent\FirsSpiritPreviewContentConstants;
+use Crownpeak\Shared\FirstSpiritPreviewContent\FirstSpiritPreviewContentConstants;
 
 /**
  * Config for Content Data Preview.

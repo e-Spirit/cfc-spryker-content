@@ -1,6 +1,6 @@
 <?php
 
-namespace Crownpeak\Yves\FirsSpiritPreviewContent\Exception;
+namespace Crownpeak\Yves\FirstSpiritPreviewContent\Exception;
 
 use Exception;
 

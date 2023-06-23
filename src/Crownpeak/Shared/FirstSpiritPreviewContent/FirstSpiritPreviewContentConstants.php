@@ -1,5 +1,5 @@
 <?php
-namespace Crownpeak\Shared\FirsSpiritPreviewContent;
+namespace Crownpeak\Shared\FirstSpiritPreviewContent;
 
 /**
  * Constants interface.

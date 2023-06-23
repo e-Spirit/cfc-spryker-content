@@ -3,10 +3,10 @@ namespace Crownpeak\Client\FirstSpiritPreviewContent;
 
 use Spryker\Client\Kernel\AbstractClient;
 use Spryker\Shared\Log\LoggerTrait;
-use Crownpeak\Yves\FirsSpiritPreviewContent\Exception\FirstSpiritPreviewContentClientException;
-use Crownpeak\Client\FirsSpiritPreviewContent\FirsSpiritPreviewContentClientInterface;
+use Crownpeak\Yves\FirstSpiritPreviewContent\Exception\FirstSpiritPreviewContentClientException;
+use Crownpeak\Client\FirstSpiritPreviewContent\FirstSpiritPreviewContentClientInterface;
 
-class FirstSpiritPreviewCaaSClient extends AbstractClient implements FirsSpiritPreviewContentClientInterface
+class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpiritPreviewContentClientInterface
 {
     use LoggerTrait;
 

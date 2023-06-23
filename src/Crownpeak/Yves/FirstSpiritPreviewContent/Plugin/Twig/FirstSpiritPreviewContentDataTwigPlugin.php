@@ -1,5 +1,5 @@
 <?php
-namespace Crownpeak\Yves\FirsSpiritPreviewContent\Plugin\Twig;
+namespace Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig;
 
 use Spryker\Service\Container\ContainerInterface;
 use Spryker\Yves\Kernel\AbstractPlugin;
@@ -9,8 +9,8 @@ use Twig\Environment;
 
 
 /**
- * @method \Crownpeak\Yves\FirsSpiritPreviewContent\FirstSpiritPreviewContentConfig getConfig()
- * @method \Crownpeak\Yves\FirsSpiritPreviewContent\FirstSpiritPreviewContentFactory getFactory()
+ * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentConfig getConfig()
+ * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentFactory getFactory()
  */
 
 class FirstSpiritPreviewContentDataTwigPlugin extends AbstractPlugin implements TwigPluginInterface
