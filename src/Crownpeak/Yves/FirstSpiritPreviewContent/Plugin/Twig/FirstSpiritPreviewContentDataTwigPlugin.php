@@ -1,5 +1,5 @@
 <?php
-namespace Crownpeak\Yves\FirstSpiritPreviewCaaS\Plugin\Twig;
+namespace Crownpeak\Yves\FirsSpiritPreviewContent\Plugin\Twig;
 
 use Spryker\Service\Container\ContainerInterface;
 use Spryker\Yves\Kernel\AbstractPlugin;
@@ -9,17 +9,17 @@ use Twig\Environment;
 
 
 /**
- * @method \Crownpeak\Yves\FirstSpiritPreviewCaaS\FirstSpiritPreviewCaaSConfig getConfig()
- * @method \Crownpeak\Yves\FirstSpiritPreviewCaaS\FirstSpiritPreviewCaaSFactory getFactory()
+ * @method \Crownpeak\Yves\FirsSpiritPreviewContent\FirstSpiritPreviewContentConfig getConfig()
+ * @method \Crownpeak\Yves\FirsSpiritPreviewContent\FirstSpiritPreviewContentFactory getFactory()
  */
 
-class FirstSpiritPreviewCaaSDataTwigPlugin extends AbstractPlugin implements TwigPluginInterface
+class FirstSpiritPreviewContentDataTwigPlugin extends AbstractPlugin implements TwigPluginInterface
 {
     /**
      * This is the name of the global variable that will be available in the twig templates.
      * @var string
      */
-    protected const FIRSTSPIRIT_CFC_CAAS_SCRIPT_DATA = 'firstSpiritCfcCaaSScriptData';
+    protected const FIRSTSPIRIT_CFC_CONTENT_SCRIPT_DATA = 'firstSpiritCfcContentScriptData';
 
     /**
      * {@inheritDoc}
@@ -34,7 +34,7 @@ class FirstSpiritPreviewCaaSDataTwigPlugin extends AbstractPlugin implements Twi
     public function extend(Environment $twig, ContainerInterface $container): Environment
     {
 
-        $twig = $this->setFirstSpiritCaaSEnvironmentVariables($twig);
+        $twig = $this->setFirstSpiritContentEnvironmentVariables($twig);
 
         return $twig;
     }
@@ -44,10 +44,10 @@ class FirstSpiritPreviewCaaSDataTwigPlugin extends AbstractPlugin implements Twi
      *
      * @return \Twig\Environment
      */
-    protected function setFirstSpiritCaaSEnvironmentVariables(Environment $twig): Environment
+    protected function setFirstSpiritContentEnvironmentVariables(Environment $twig): Environment
     {
 
-        $twig->addGlobal(static::FIRSTSPIRIT_CFC_CAAS_SCRIPT_DATA, $this->firstSpiritCfcScriptData());
+        $twig->addGlobal(static::FIRSTSPIRIT_CFC_CONTENT_SCRIPT_DATA, $this->firstSpiritCfcContentScriptData());
 
         return $twig;
     }
@@ -56,13 +56,13 @@ class FirstSpiritPreviewCaaSDataTwigPlugin extends AbstractPlugin implements Twi
      * The script that will be added to the twig template.
      * @return array
      */
-    public function firstSpiritCfcScriptData(): array
+    public function firstSpiritCfcContentScriptData(): array
     {
         $id = '193';
         $type= 'product';
         $language = 'en_GB';
-        $url = $this->getConfig()->getCaasEndpointScript();
-        $content = $this->getFactory()->getCaaSJsonFetcherClient()->fetchCaaSDataFromUrl($url, $id, $type, $language);
+        $url = $this->getConfig()->getContentEndpointScript();
+        $content = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($url, $id, $type, $language);
         return $content;
     }
 }

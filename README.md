@@ -1,5 +1,5 @@
 # cfc-spryker-content
-`FirstSpirit Preview CaaS Module for Spryker`
+`FirstSpirit Preview Content Module for Spryker`
 
 ## Installation
 **Composer**
@@ -22,7 +22,7 @@ $ composer require ecom-espirit/cfc-spryker-content
 
 Add the following to your `config/Shared/config_default.php` file
 ```
-use Crownpeak\Shared\FirstSpiritPreviewCaaS\FirstSpiritPreviewCaaSConstants;
+use Crownpeak\Shared\FirstSpiritPreviewContent\FirstSpiritPreviewContentConstants;
 ```
 Add Crownpeak to the project namespaces in config/Shared/config_default.php:
 ```
@@ -35,8 +35,8 @@ and then:
 ```
 ...
 
-// ----------- FirstSpirit Preview CaaS Configuration
-$config[FirstSpiritPreviewCaaSConstants::FIRSTSPIRIT_PREVIEW_CAAS_SCRIPT_URL] = '<ADD CaaS Endpoint HOST (without parameters)>';
+// ----------- FirstSpirit Preview Content Configuration
+$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_CONTENT_SCRIPT_URL] = '<ADD Content Endpoint HOST (without parameters)>';
 ```
 for local url the value can be:
 ```
@@ -47,11 +47,11 @@ http://host.docker.internal:3001/api/findPage
 
 Add the following to your `src/Pyz/Yves/Twig/TwigDependencyProvider.php` file
 ```
-use Crownpeak\Yves\FirstSpiritPreviewCaaS\Plugin\Twig\FirstSpiritPreviewCaaSDataTwigPlugin;
+use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewContentDataTwigPlugin;
 ```
 and in the function `protected function getTwigPlugins(): array {` add the following line
 ```
-new FirstSpiritPreviewCaaSDataTwigPlugin(),
+new FirstSpiritPreviewContentDataTwigPlugin(),
 ```
 
 **Add twig variable in Main page layouts**
@@ -72,8 +72,8 @@ after this line:
 ```
 {% set placeholder_sup_content = '' %}
 {% set placeholder_sub_content = '' %}
-{% if firstSpiritCfcCaaSScriptData %}
-    {% for items in firstSpiritCfcCaaSScriptData.items[0].children %}
+{% if firstSpiritCfcContentScriptData %}
+    {% for items in firstSpiritCfcContentScriptData.items[0].children %}
         {% if items.name == 'sup_content' and items.children|length > 0 %}
             {% set placeholder_sup_content = items.children|json_encode() %}
         {% endif %}

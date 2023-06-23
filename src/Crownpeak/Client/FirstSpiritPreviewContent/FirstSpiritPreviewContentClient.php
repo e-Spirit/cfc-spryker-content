@@ -1,12 +1,12 @@
 <?php
-namespace Crownpeak\Client\FirstSpiritPreviewCaaS;
+namespace Crownpeak\Client\FirstSpiritPreviewContent;
 
 use Spryker\Client\Kernel\AbstractClient;
 use Spryker\Shared\Log\LoggerTrait;
-use Crownpeak\Yves\FirstSpiritPreviewCaaS\Exception\FirstSpiritPreviewCaaSClientException;
-use Crownpeak\Client\FirstSpiritPreviewCaaS\FirstSpiritPreviewCaaSClientInterface;
+use Crownpeak\Yves\FirsSpiritPreviewContent\Exception\FirstSpiritPreviewContentClientException;
+use Crownpeak\Client\FirsSpiritPreviewContent\FirsSpiritPreviewContentClientInterface;
 
-class FirstSpiritPreviewCaaSClient extends AbstractClient implements FirstSpiritPreviewCaaSClientInterface
+class FirstSpiritPreviewCaaSClient extends AbstractClient implements FirsSpiritPreviewContentClientInterface
 {
     use LoggerTrait;
 
@@ -16,9 +16,9 @@ class FirstSpiritPreviewCaaSClient extends AbstractClient implements FirstSpirit
      * @param string $type
      * @param string $language
      * @return array
-     * @throws FirstSpiritPreviewCaaSClientException
+     * @throws FirstSpiritPreviewContentClientException
      */
-    public function fetchCaaSDataFromUrl(string $url, int $id, string $type, string $language): array
+    public function fetchContentDataFromUrl(string $url, int $id, string $type, string $language): array
     {
         $query = http_build_query(
             array(
@@ -30,7 +30,7 @@ class FirstSpiritPreviewCaaSClient extends AbstractClient implements FirstSpirit
 
         $url = $url . $this->getNextQueryParam($url) . $query;
 
-        $this->getLogger()->info('[FirstSpiritCaaSRequester] CaaS request url: ' . $url);
+        $this->getLogger()->info('[FirstSpiritContentRequester] Content request url: ' . $url);
 
         $ch = curl_init();
         curl_setopt($ch,CURLOPT_URL, $url);
@@ -38,7 +38,7 @@ class FirstSpiritPreviewCaaSClient extends AbstractClient implements FirstSpirit
         $curlData = curl_exec($ch);
 
         if (curl_errno($ch)) {
-            throw new FirstSpiritPreviewCaaSClientException(curl_error($ch));
+            throw new FirstSpiritPreviewContentClientException(curl_error($ch));
         }
 
         curl_close($ch);
