@@ -54,16 +54,66 @@ and in the function `protected function getTwigPlugins(): array {` add the follo
 new FirstSpiritPreviewCaaSDataTwigPlugin(),
 ```
 
-**Add twig variable in Main page > page-layout-main.twig**
+**Add twig variable in Main page layouts**
 
-Add the following to your `src/Pyz/Yves/ShopUi/Theme/default/templates/page-layout-main/page-layout-main.twig` file, like this:
+Add the following to your `src/Pyz/Yves/ShopUi/Theme/default/templates/page-layout-main/page-layout-main.twig` and
+`src/Pyz/Yves/CatalogPage/Theme/default/templates/page-layout-catalog/page-layout-catalog.twig` files, like this:
 
 ***Note:** this is temporary!*
+
+after this line:
 ```
-{% block body %}
-    {{ dump(firstSpiritCfcCaaSScriptData) }}
-    ...
+{% define data = {
+   ...
+} %}
 ```
+
+
+```
+{% set placeholder_sup_content = '' %}
+{% set placeholder_sub_content = '' %}
+{% if firstSpiritCfcCaaSScriptData %}
+    {% for items in firstSpiritCfcCaaSScriptData.items[0].children %}
+        {% if items.name == 'sup_content' and items.children|length > 0 %}
+            {% set placeholder_sup_content = items.children|json_encode() %}
+        {% endif %}
+        {% if items.name == 'sub_content' and items.children|length > 0 %}
+            {% set placeholder_sup_content = items.children|json_encode() %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+...
+```
+
+_**and in these lines:**_
+
+(changes below apply to `src/Pyz/Yves/HomePage/Theme/default/views/home/home.twig` template as well)
+
+add **{{ placeholder_sup_content }}** variable.
+```
+ <div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="sup_content">
+   
+ </div>
+```
+```
+<div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="sup_content">
+   {{ placeholder_sup_content }}
+ </div>
+```
+
+add **{{ placeholder_sub_content }}** variable.
+
+```
+ <div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="sub_content">
+ 
+ </div>
+```
+```
+ <div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="sub_content">
+   {{ placeholder_sub_content }}
+ </div>
+```
+
 
 ## Testing
 To test a particular branch in your Spryker installation replace _{branchname}_ in the command below:
