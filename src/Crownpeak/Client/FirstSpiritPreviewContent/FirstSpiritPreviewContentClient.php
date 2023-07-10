@@ -6,6 +6,9 @@ use Spryker\Shared\Log\LoggerTrait;
 use Crownpeak\Yves\FirstSpiritPreviewContent\Exception\FirstSpiritPreviewContentClientException;
 use Crownpeak\Client\FirstSpiritPreviewContent\FirstSpiritPreviewContentClientInterface;
 
+/*
+ * FirstSpiritPreviewContent Client.
+ */
 class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpiritPreviewContentClientInterface
 {
     use LoggerTrait;

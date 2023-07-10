@@ -2,6 +2,9 @@
 
 namespace Crownpeak\Client\FirstSpiritPreviewContent;
 
+/*
+ * FirstSpiritPreviewContent Client Interface.
+ */
 interface FirstSpiritPreviewContentClientInterface
 {
     /**

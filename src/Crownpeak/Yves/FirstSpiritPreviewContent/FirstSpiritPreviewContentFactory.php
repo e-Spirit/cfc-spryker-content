@@ -5,6 +5,9 @@ use Crownpeak\Client\FirstSpiritPreviewContent\FirstSpiritPreviewContentClientIn
 use Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentDependencyProvider;
 use Spryker\Yves\Kernel\AbstractFactory;
 
+/**
+ * FirstSpiritPreviewContent Factory.
+ */
 class FirstSpiritPreviewContentFactory extends AbstractFactory
 {
     /**

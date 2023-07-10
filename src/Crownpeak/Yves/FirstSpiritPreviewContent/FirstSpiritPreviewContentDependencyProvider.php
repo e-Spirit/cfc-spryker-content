@@ -6,6 +6,9 @@ use Crownpeak\Client\FirstSpiritPreviewContent\FirstSpiritPreviewContentClientIn
 use Spryker\Yves\Kernel\AbstractBundleDependencyProvider;
 use Spryker\Yves\Kernel\Container;
 
+/**
+ * Dependency Provider.
+ */
 class FirstSpiritPreviewContentDependencyProvider extends AbstractBundleDependencyProvider
 {
     public const CONTENT_JSON_FETCHER = 'CONTENT_JSON_FETCHER';

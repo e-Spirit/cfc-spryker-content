@@ -47,47 +47,82 @@ http://host.docker.internal:3001/api/findPage
 
 Add the following to your `src/Pyz/Yves/Twig/TwigDependencyProvider.php` file
 ```
-use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewContentDataTwigPlugin;
+use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewContentDataTwigFunction;
 ```
 and in the function `protected function getTwigPlugins(): array {` add the following line
 ```
-new FirstSpiritPreviewContentDataTwigPlugin(),
+new FirstSpiritPreviewContentDataTwigFunction(),
 ```
 
-**Add twig variable in Main page layouts**
+**Add twig variable in template(s)**
 
-Add the following to your `src/Pyz/Yves/ShopUi/Theme/default/templates/page-layout-main/page-layout-main.twig` and
-`src/Pyz/Yves/CatalogPage/Theme/default/templates/page-layout-catalog/page-layout-catalog.twig` files, like this:
+Edit templates to include lines described below:
 
-***Note:** this is temporary!*
 
-after this line:
+**Product template:** after this line for `src/Pyz/Yves/ProductDetailPage/Theme/default/views/pdp/pdp.twig` file:
 ```
-{% define data = {
-   ...
-} %}
+{% block content %}
 ```
-
-
 ```
-{% set placeholder_sup_content = '' %}
-{% set placeholder_sub_content = '' %}
-{% if firstSpiritCfcContentScriptData %}
-    {% for items in firstSpiritCfcContentScriptData.items[0].children %}
-        {% if items.name == 'sup_content' and items.children|length > 0 %}
-            {% set placeholder_sup_content = items.children|json_encode() %}
-        {% endif %}
-        {% if items.name == 'sub_content' and items.children|length > 0 %}
-            {% set placeholder_sup_content = items.children|json_encode() %}
-        {% endif %}
-    {% endfor %}
-{% endif %}
+    {% set placeholder_sup_content = '' %}
+    {% set placeholder_sub_content = '' %}
+    {% set fsContentData = firstSpiritCfcContentScriptData(data.product.idProductAbstract, 'product', data.appLocale ) %}
+    {% if fsContentData.items is not empty %}
+        {% for items in fsContentData.items[0].children %}
+            {% if items.name == 'sup_content' and items.children|length > 0 %}
+                {% set placeholder_sup_content = items.children|json_encode() %}
+            {% endif %}
+            {% if items.name == 'sub_content' and items.children|length > 0 %}
+                {% set placeholder_sup_content = items.children|json_encode() %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 ...
 ```
 
-_**and in these lines:**_
+**Catalog template:** after this line for `src/Pyz/Yves/CatalogPage/Theme/default/templates/page-layout-catalog/page-layout-catalog.twig` file:
+```
+{% block container %}
+```
+```
+    {% set placeholder_sup_content = '' %}
+    {% set placeholder_sub_content = '' %}
+    {% set fsContentData = firstSpiritCfcContentScriptData(data.category.id_category, 'category', app.locale) %}
+    {% if fsContentData.items is not empty %}
+        {% for items in fsContentData.items[0].children %}
+            {% if items.name == 'sup_content' and items.children|length > 0 %}
+                {% set placeholder_sup_content = items.children|json_encode() %}
+            {% endif %}
+            {% if items.name == 'sub_content' and items.children|length > 0 %}
+                {% set placeholder_sup_content = items.children|json_encode() %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+...
+```
 
-(changes below apply to `src/Pyz/Yves/HomePage/Theme/default/views/home/home.twig` template as well)
+**CMS page templates:** after this line for `src/Pyz/Shared/Cms/Theme/default/templates/placeholders-title-content/placeholders-title-content.twig` and
+`src/Pyz/Shared/Cms/Theme/default/templates/placeholders-title-content-slot/placeholders-title-content-slot.twig` files:
+```
+{% block content %}
+```
+```
+    {% set placeholder_sup_content = '' %}
+    {% set placeholder_sub_content = '' %}
+    {% set fsContentData = firstSpiritCfcContentScriptData(_view.idCmsPage, 'content', data.appLocale ) %}
+    {% if fsContentData.items is not empty %}
+        {% for items in fsContentData.items[0].children %}
+            {% if items.name == 'sup_content' and items.children|length > 0 %}
+                {% set placeholder_sup_content = items.children|json_encode() %}
+            {% endif %}
+            {% if items.name == 'sub_content' and items.children|length > 0 %}
+                {% set placeholder_sup_content = items.children|json_encode() %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+...
+```
+_**and in these lines for all templates mentioned above:**_
 
 add **{{ placeholder_sup_content }}** variable.
 ```
