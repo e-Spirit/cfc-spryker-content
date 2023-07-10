@@ -10,7 +10,6 @@ use Twig\Environment;
 /**
  * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentConfig getConfig()
  * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentFactory getFactory()
- * @method \Spryker\Client\Product\ProductClientInterface getClient()
  */
 /**
  * Twig function go set Content Url and get content data.
