@@ -36,7 +36,7 @@ and then:
 ...
 
 // ----------- FirstSpirit Preview Content Configuration
-$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_CONTENT_SCRIPT_URL] = '<ADD Content Endpoint HOST (without parameters)>';
+$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_FRONTEND_API_SERVER_URL] = '<ADD Content Endpoint HOST (without parameters)>';
 ```
 for local url the value can be:
 ```
