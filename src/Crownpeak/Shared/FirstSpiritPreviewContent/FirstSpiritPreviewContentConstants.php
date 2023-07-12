@@ -8,7 +8,7 @@ interface FirstSpiritPreviewContentConstants
 {
     /**
      * Specification:
-     * - Content Script endpoint url
+     * - Frontend API Server Url
      */
-    public const FIRSTSPIRIT_PREVIEW_CONTENT_SCRIPT_URL = 'FIRSTSPIRIT_PREVIEW_CONTENT:CONTENT_SCRIPT_URL';
+    public const FIRSTSPIRIT_FRONTEND_API_SERVER_URL = 'FIRSTSPIRIT_PREVIEW_CONTENT:FRONTEND_API_SERVER_URL';
 }

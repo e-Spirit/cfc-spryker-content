@@ -14,6 +14,6 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
      */
     public function getContentEndpointScript(): string
     {
-        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_CONTENT_SCRIPT_URL, '');
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_FRONTEND_API_SERVER_URL, '');
     }
 }
