@@ -67,13 +67,23 @@ Edit templates to include lines described below:
     {% set placeholder_sup_content = '' %}
     {% set placeholder_sub_content = '' %}
     {% set fsContentData = firstSpiritCfcContentScriptData(data.product.idProductAbstract, 'product', data.appLocale ) %}
+    {% set contentData = [] %}
+    {% set previewIdChildren = '' %}
     {% if fsContentData.items is not empty %}
-        {% for items in fsContentData.items[0].children %}
-            {% if items.name == 'sup_content' and items.children|length > 0 %}
-                {% set placeholder_sup_content = items.children|json_encode() %}
+        {% for key, items in fsContentData.items[0].children %}
+            {% if items.name == 'sup_content' %}
+                {% if items.children|length > 0 %}
+                    {% set previewIdChildren = items.children[key].previewId %}
+                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                {% endif %}
             {% endif %}
-            {% if items.name == 'sub_content' and items.children|length > 0 %}
-                {% set placeholder_sup_content = items.children|json_encode() %}
+            {% if items.name == 'sub_content' %}
+                {% if items.children|length > 0 %}
+                    {% set previewIdChildren = items.children[key].previewId %}
+                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                {% endif %}
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -88,13 +98,23 @@ Edit templates to include lines described below:
     {% set placeholder_sup_content = '' %}
     {% set placeholder_sub_content = '' %}
     {% set fsContentData = firstSpiritCfcContentScriptData(data.category.id_category, 'category', app.locale) %}
+    {% set contentData = [] %}
+    {% set previewIdChildren = '' %}
     {% if fsContentData.items is not empty %}
-        {% for items in fsContentData.items[0].children %}
-            {% if items.name == 'sup_content' and items.children|length > 0 %}
-                {% set placeholder_sup_content = items.children|json_encode() %}
+        {% for key, items in fsContentData.items[0].children %}
+            {% if items.name == 'sup_content' %}
+                {% if items.children|length > 0 %}
+                    {% set previewIdChildren = items.children[key].previewId %}
+                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                {% endif %}
             {% endif %}
-            {% if items.name == 'sub_content' and items.children|length > 0 %}
-                {% set placeholder_sup_content = items.children|json_encode() %}
+            {% if items.name == 'sub_content' %}
+                {% if items.children|length > 0 %}
+                    {% set previewIdChildren = items.children[key].previewId %}
+                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                {% endif %}
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -110,13 +130,23 @@ Edit templates to include lines described below:
     {% set placeholder_sup_content = '' %}
     {% set placeholder_sub_content = '' %}
     {% set fsContentData = firstSpiritCfcContentScriptData(_view.idCmsPage, 'content', data.appLocale ) %}
+    {% set contentData = [] %}
+    {% set previewIdChildren = '' %}
     {% if fsContentData.items is not empty %}
-        {% for items in fsContentData.items[0].children %}
-            {% if items.name == 'sup_content' and items.children|length > 0 %}
-                {% set placeholder_sup_content = items.children|json_encode() %}
+        {% for key, items in fsContentData.items[0].children %}
+            {% if items.name == 'sup_content' %}
+                {% if items.children|length > 0 %}
+                    {% set previewIdChildren = items.children[key].previewId %}
+                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                {% endif %}
             {% endif %}
-            {% if items.name == 'sub_content' and items.children|length > 0 %}
-                {% set placeholder_sup_content = items.children|json_encode() %}
+            {% if items.name == 'sub_content' %}
+                {% if items.children|length > 0 %}
+                    {% set previewIdChildren = items.children[key].previewId %}
+                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                {% endif %}
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -132,7 +162,7 @@ add **{{ placeholder_sup_content }}** variable.
 ```
 ```
 <div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="sup_content">
-   {{ placeholder_sup_content }}
+   {{ placeholder_sup_content | raw }}
  </div>
 ```
 
@@ -145,7 +175,7 @@ add **{{ placeholder_sub_content }}** variable.
 ```
 ```
  <div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="sub_content">
-   {{ placeholder_sub_content }}
+   {{ placeholder_sub_content | raw }}
  </div>
 ```
 
