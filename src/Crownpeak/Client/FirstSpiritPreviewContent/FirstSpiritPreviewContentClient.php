@@ -27,7 +27,7 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
             array(
                 'id' => $id,
                 'type' => $type,
-                'language' => $language,
+                'locale' => $language,
             )
         );
 
