@@ -19,7 +19,12 @@ class FirstSpiritPreviewContentFactory extends AbstractFactory
         return $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CONTENT_JSON_FETCHER);
     }
 
-    public function setReferer(string $referer): void
+    /**
+     * Sets the referer to the JSON client.
+     * 
+     * @param string $referer The value to set.
+     */
+    public function setReferer(string $referer)
     {
         $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CONTENT_JSON_FETCHER)->setReferer($referer);
     }

@@ -60,7 +60,12 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
         return $data;
     }
 
-    public function setReferer(string $referer)
+    /**
+     * Sets the referer value to use when performing requests.
+     * 
+     * @param string $referer The value to set.
+     */
+    public function setReferer(string $referer): void
     {
         $this->referer = $referer;
     }

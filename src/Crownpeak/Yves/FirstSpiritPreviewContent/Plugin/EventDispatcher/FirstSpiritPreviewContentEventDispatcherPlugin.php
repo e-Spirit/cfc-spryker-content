@@ -51,6 +51,7 @@ class FirstSpiritPreviewContentEventDispatcherPlugin extends AbstractPlugin impl
                 }
                 $request = $event->getRequest();
                 $session = $event->getRequest()->getSession();
+                // If there is already a value in the session, use it as it will be the one from CC
                 if ($session->has(self::HEADER_REFERER)) {
                     $referer = $session->get(self::HEADER_REFERER);
                     $this->getLogger()->info("Using referer from session: " . $referer);
