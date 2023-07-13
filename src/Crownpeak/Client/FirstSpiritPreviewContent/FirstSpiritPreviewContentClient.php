@@ -15,13 +15,13 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
 
     /**
      * @param string $url
-     * @param int $id
+     * @param mixed $id
      * @param string $type
      * @param string $language
      * @return array
      * @throws FirstSpiritPreviewContentClientException
      */
-    public function fetchContentDataFromUrl(string $url, int $id, string $type, string $language): array
+    public function fetchContentDataFromUrl(string $url, mixed $id, string $type, string $language): array
     {
         $query = http_build_query(
             array(

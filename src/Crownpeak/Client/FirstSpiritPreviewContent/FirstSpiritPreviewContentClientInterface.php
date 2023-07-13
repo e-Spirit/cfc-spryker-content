@@ -9,10 +9,10 @@ interface FirstSpiritPreviewContentClientInterface
 {
     /**
      * @param string $url
-     * @param int $id
+     * @param mixed $id
      * @param string $type
      * @param string $language
      * @return array
      */
-    public function fetchContentDataFromUrl(string $url, int $id, string $type, string $language): array;
+    public function fetchContentDataFromUrl(string $url, mixed $id, string $type, string $language): array;
 }

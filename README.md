@@ -59,6 +59,37 @@ new FirstSpiritPreviewContentDataTwigFunction(),
 Edit templates to include lines described below:
 
 
+**Homepage template:** after this line for `src/Pyz/Yves/HomePage/Theme/default/views/home/home.twig` file:
+```
+{% block container %}
+```
+```
+    {% set placeholder_sup_content = '' %}
+    {% set placeholder_sub_content = '' %}
+    {% set fsContentData = firstSpiritCfcContentScriptData(data.product.idProductAbstract, 'product', data.appLocale ) %}
+    {% set contentData = [] %}
+    {% set previewIdChildren = '' %}
+    {% if fsContentData.items is not empty %}
+        {% for items in fsContentData.items[0].children %}
+            {% if items.name == 'sup_content' %}
+                {% if items.children|length > 0 %}
+                    {% set previewIdChildren = items.children[0].previewId %}
+                    {% set contentData = items.children[0].data|json_encode() %}
+                    {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                {% endif %}
+            {% endif %}
+            {% if items.name == 'sub_content' %}
+                {% if items.children|length > 0 %}
+                    {% set previewIdChildren = items.children[0].previewId %}
+                    {% set contentData = items.children[0].data|json_encode() %}
+                    {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+...
+```
+
 **Product template:** after this line for `src/Pyz/Yves/ProductDetailPage/Theme/default/views/pdp/pdp.twig` file:
 ```
 {% block content %}
@@ -70,18 +101,18 @@ Edit templates to include lines described below:
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
     {% if fsContentData.items is not empty %}
-        {% for key, items in fsContentData.items[0].children %}
+        {% for items in fsContentData.items[0].children %}
             {% if items.name == 'sup_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[key].previewId %}
-                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set previewIdChildren = items.children[0].previewId %}
+                    {% set contentData = items.children[0].data|json_encode() %}
                     {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
                 {% endif %}
             {% endif %}
             {% if items.name == 'sub_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[key].previewId %}
-                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set previewIdChildren = items.children[0].previewId %}
+                    {% set contentData = items.children[0].data|json_encode() %}
                     {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
                 {% endif %}
             {% endif %}
@@ -101,18 +132,18 @@ Edit templates to include lines described below:
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
     {% if fsContentData.items is not empty %}
-        {% for key, items in fsContentData.items[0].children %}
+        {% for items in fsContentData.items[0].children %}
             {% if items.name == 'sup_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[key].previewId %}
-                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set previewIdChildren = items.children[0].previewId %}
+                    {% set contentData = items.children[0].data|json_encode() %}
                     {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
                 {% endif %}
             {% endif %}
             {% if items.name == 'sub_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[key].previewId %}
-                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set previewIdChildren = items.children[0].previewId %}
+                    {% set contentData = items.children[0].data|json_encode() %}
                     {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
                 {% endif %}
             {% endif %}
@@ -133,18 +164,18 @@ Edit templates to include lines described below:
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
     {% if fsContentData.items is not empty %}
-        {% for key, items in fsContentData.items[0].children %}
+        {% for items in fsContentData.items[0].children %}
             {% if items.name == 'sup_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[key].previewId %}
-                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set previewIdChildren = items.children[0].previewId %}
+                    {% set contentData = items.children[0].data|json_encode() %}
                     {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
                 {% endif %}
             {% endif %}
             {% if items.name == 'sub_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[key].previewId %}
-                    {% set contentData = items.children[key].data|json_encode() %}
+                    {% set previewIdChildren = items.children[0].previewId %}
+                    {% set contentData = items.children[0].data|json_encode() %}
                     {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
                 {% endif %}
             {% endif %}
@@ -152,7 +183,7 @@ Edit templates to include lines described below:
     {% endif %}
 ...
 ```
-_**and in these lines for all templates mentioned above:**_
+_**and in these lines for all templates mentioned above not including homepage:**_
 
 add **{{ placeholder_sup_content }}** variable.
 ```
@@ -179,6 +210,32 @@ add **{{ placeholder_sub_content }}** variable.
  </div>
 ```
 
+_For **homepage** should be:_
+
+add **{{ placeholder_sup_content }}** variable.
+```
+<div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="stage">
+     
+</div>
+```
+```
+<div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="stage">
+   {{ placeholder_sup_content | raw }}
+</div>
+```
+
+add **{{ placeholder_sub_content }}** variable.
+
+```
+<div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="content">
+ 
+</div>
+```
+```
+<div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="content">
+    {{ placeholder_sub_content | raw }}
+</div>
+```
 
 ## Testing
 To test a particular branch in your Spryker installation replace _{branchname}_ in the command below:
