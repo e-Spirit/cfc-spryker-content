@@ -40,13 +40,15 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $curlData = curl_exec($ch);
 
-        if (curl_errno($ch)) {
-            throw new FirstSpiritPreviewContentClientException(curl_error($ch));
+        //Do soft logging if the url is not reachable
+        $data = array();
+        if ($curlData === false) {
+            $this->getLogger()->info('[FirstSpiritContentRequester] URL Not Reachable: ' . $url);
+        } else {
+            $data = json_decode($curlData, true);
         }
 
         curl_close($ch);
-
-        $data = json_decode($curlData, true);
 
         return $data;
     }
