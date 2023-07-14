@@ -81,20 +81,27 @@ Edit templates to include lines described below:
     {% set fsContentData = firstSpiritCfcContentScriptData(data.product.idProductAbstract, 'product', data.appLocale ) %}
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
+    {% set sections_content = [] %}
     {% if fsContentData.items is not empty %}
         {% for items in fsContentData.items[0].children %}
-            {% if items.name == 'sup_content' %}
+            {% if items.name == 'stage' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[0].previewId %}
-                    {% set contentData = items.children[0].data|json_encode() %}
-                    {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                    {% for key, sections in items.children %}
+                        {% set previewIdChildren = items.children[key].previewId %}
+                        {% set contentData = items.children[key].data|json_encode() %}
+                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
+                        {% set placeholder_sup_content = sections_content|join(' ') %}
+                    {% endfor %}
                 {% endif %}
             {% endif %}
-            {% if items.name == 'sub_content' %}
+            {% if items.name == 'content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[0].previewId %}
-                    {% set contentData = items.children[0].data|json_encode() %}
-                    {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                    {% for key, sections in items.children %}
+                        {% set previewIdChildren = items.children[key].previewId %}
+                        {% set contentData = items.children[key].data|json_encode() %}
+                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
+                        {% set placeholder_sub_content = sections_content|join(' ') %}
+                    {% endfor %}
                 {% endif %}
             {% endif %}
         {% endfor %}
@@ -112,20 +119,27 @@ Edit templates to include lines described below:
     {% set fsContentData = firstSpiritCfcContentScriptData(data.product.idProductAbstract, 'product', data.appLocale ) %}
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
+    {% set sections_content = [] %}
     {% if fsContentData.items is not empty %}
         {% for items in fsContentData.items[0].children %}
             {% if items.name == 'sup_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[0].previewId %}
-                    {% set contentData = items.children[0].data|json_encode() %}
-                    {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                    {% for key, sections in items.children %}
+                        {% set previewIdChildren = items.children[key].previewId %}
+                        {% set contentData = items.children[key].data|json_encode() %}
+                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
+                        {% set placeholder_sup_content = sections_content|join(' ') %}
+                    {% endfor %}
                 {% endif %}
             {% endif %}
             {% if items.name == 'sub_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[0].previewId %}
-                    {% set contentData = items.children[0].data|json_encode() %}
-                    {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                    {% for key, sections in items.children %}
+                        {% set previewIdChildren = items.children[key].previewId %}
+                        {% set contentData = items.children[key].data|json_encode() %}
+                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
+                        {% set placeholder_sub_content = sections_content|join(' ') %}
+                    {% endfor %}
                 {% endif %}
             {% endif %}
         {% endfor %}
@@ -143,20 +157,27 @@ Edit templates to include lines described below:
     {% set fsContentData = firstSpiritCfcContentScriptData(data.category.id_category, 'category', app.locale) %}
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
+    {% set sections_content = [] %}
     {% if fsContentData.items is not empty %}
         {% for items in fsContentData.items[0].children %}
             {% if items.name == 'sup_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[0].previewId %}
-                    {% set contentData = items.children[0].data|json_encode() %}
-                    {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                    {% for key, sections in items.children %}
+                        {% set previewIdChildren = items.children[key].previewId %}
+                        {% set contentData = items.children[key].data|json_encode() %}
+                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
+                        {% set placeholder_sup_content = sections_content|join(' ') %}
+                    {% endfor %}
                 {% endif %}
             {% endif %}
             {% if items.name == 'sub_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[0].previewId %}
-                    {% set contentData = items.children[0].data|json_encode() %}
-                    {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                    {% for key, sections in items.children %}
+                        {% set previewIdChildren = items.children[key].previewId %}
+                        {% set contentData = items.children[key].data|json_encode() %}
+                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
+                        {% set placeholder_sub_content = sections_content|join(' ') %}
+                    {% endfor %}
                 {% endif %}
             {% endif %}
         {% endfor %}
@@ -175,20 +196,27 @@ Edit templates to include lines described below:
     {% set fsContentData = firstSpiritCfcContentScriptData(_view.idCmsPage, 'content', data.appLocale ) %}
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
+    {% set sections_content = [] %}
     {% if fsContentData.items is not empty %}
         {% for items in fsContentData.items[0].children %}
             {% if items.name == 'sup_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[0].previewId %}
-                    {% set contentData = items.children[0].data|json_encode() %}
-                    {% set placeholder_sup_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                    {% for key, sections in items.children %}
+                        {% set previewIdChildren = items.children[key].previewId %}
+                        {% set contentData = items.children[key].data|json_encode() %}
+                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
+                        {% set placeholder_sup_content = sections_content|join(' ') %}
+                    {% endfor %}
                 {% endif %}
             {% endif %}
             {% if items.name == 'sub_content' %}
                 {% if items.children|length > 0 %}
-                    {% set previewIdChildren = items.children[0].previewId %}
-                    {% set contentData = items.children[0].data|json_encode() %}
-                    {% set placeholder_sub_content = '<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>' %}
+                    {% for key, sections in items.children %}
+                        {% set previewIdChildren = items.children[key].previewId %}
+                        {% set contentData = items.children[key].data|json_encode() %}
+                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
+                        {% set placeholder_sub_content = sections_content|join(' ') %}
+                    {% endfor %}
                 {% endif %}
             {% endif %}
         {% endfor %}
