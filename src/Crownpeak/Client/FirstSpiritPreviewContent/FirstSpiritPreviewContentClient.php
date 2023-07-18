@@ -49,20 +49,22 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
 
         // Do soft logging if the url is not reachable
         $data = array();
+        $items = 0;
         if ($curlData === false) {
             $this->getLogger()->info('[FirstSpiritContentRequester] URL Not Reachable: ' . $url);
         } else {
             $data = json_decode($curlData, true);
+            $items = count($data['items']);
+            if (!(empty($data['items'][0]))) {
+                foreach ($data['items'][0]['children'] as $slot) {
+                    $this->getLogger()->info('[FirstSpiritContentRequester] Found ' . count($slot['children']) . ' sections for slot ' . $slot['name']);
+                }
+            }
         }
 
         curl_close($ch);
 
-        $this->getLogger()->info('[FirstSpiritContentRequester] Found ' . count($data['items']) . ' elements');
-        if (!is_null($data['items'][0])) {
-            foreach ($data['items'][0]['children'] as $slot) {
-                $this->getLogger()->info('[FirstSpiritContentRequester] Found ' . count($slot['children']) . ' sections for slot ' . $slot['name']);
-            }
-        }
+        $this->getLogger()->info('[FirstSpiritContentRequester] Found ' . $items . ' elements');
 
         return $data;
     }
