@@ -47,13 +47,15 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
         ]);
         $curlData = curl_exec($ch);
 
-        if (curl_errno($ch)) {
-            throw new FirstSpiritPreviewContentClientException(curl_error($ch));
+        //Do soft logging if the url is not reachable
+        $data = array();
+        if ($curlData === false) {
+            $this->getLogger()->info('[FirstSpiritContentRequester] URL Not Reachable: ' . $url);
+        } else {
+            $data = json_decode($curlData, true);
         }
 
         curl_close($ch);
-
-        $data = json_decode($curlData, true);
 
         $this->getLogger()->info('[FirstSpiritContentRequester] Found ' . count($data['items']) . ' elements');
 
@@ -62,7 +64,7 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
 
     /**
      * Sets the referer value to use when performing requests.
-     * 
+     *
      * @param string $referer The value to set.
      */
     public function setReferer(string $referer): void
