@@ -47,10 +47,6 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
         ]);
         $curlData = curl_exec($ch);
 
-        if (curl_errno($ch)) {
-            throw new FirstSpiritPreviewContentClientException(curl_error($ch));
-        }
-
         // Do soft logging if the url is not reachable
         $data = array();
         if ($curlData === false) {
