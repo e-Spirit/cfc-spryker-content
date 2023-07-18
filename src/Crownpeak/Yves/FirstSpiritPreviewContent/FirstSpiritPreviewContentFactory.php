@@ -1,4 +1,5 @@
 <?php
+
 namespace Crownpeak\Yves\FirstSpiritPreviewContent;
 
 use Crownpeak\Client\FirstSpiritPreviewContent\FirstSpiritPreviewContentClientInterface;
@@ -16,5 +17,15 @@ class FirstSpiritPreviewContentFactory extends AbstractFactory
     public function getContentJsonFetcherClient(): FirstSpiritPreviewContentClientInterface
     {
         return $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CONTENT_JSON_FETCHER);
+    }
+
+    /**
+     * Sets the referer to the JSON client.
+     * 
+     * @param string $referer The value to set.
+     */
+    public function setReferer(string $referer)
+    {
+        $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CONTENT_JSON_FETCHER)->setReferer($referer);
     }
 }
