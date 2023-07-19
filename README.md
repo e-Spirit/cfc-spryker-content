@@ -82,10 +82,13 @@ Edit templates to include lines described below:
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
     {% set sections_content = [] %}
+    {% if fsContentData is not empty %}
     {% if fsContentData.items is not empty %}
         {% for items in fsContentData.items[0].children %}
+            {{ dump(items) }}
             {% if items.name == 'stage' %}
                 {% if items.children|length > 0 %}
+                    {{ dump(items.children) }}
                     {% for key, sections in items.children %}
                         {% set previewIdChildren = items.children[key].previewId %}
                         {% set contentData = items.children[key].data|json_encode() %}
@@ -106,6 +109,7 @@ Edit templates to include lines described below:
             {% endif %}
         {% endfor %}
     {% endif %}
+    {% endif %}
 ...
 ```
 
@@ -120,6 +124,7 @@ Edit templates to include lines described below:
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
     {% set sections_content = [] %}
+    {% if fsContentData is not empty %}
     {% if fsContentData.items is not empty %}
         {% for items in fsContentData.items[0].children %}
             {% if items.name == 'sup_content' %}
@@ -144,6 +149,7 @@ Edit templates to include lines described below:
             {% endif %}
         {% endfor %}
     {% endif %}
+    {% endif %}
 ...
 ```
 
@@ -158,6 +164,7 @@ Edit templates to include lines described below:
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
     {% set sections_content = [] %}
+    {% if fsContentData is not empty %}
     {% if fsContentData.items is not empty %}
         {% for items in fsContentData.items[0].children %}
             {% if items.name == 'sup_content' %}
@@ -181,6 +188,7 @@ Edit templates to include lines described below:
                 {% endif %}
             {% endif %}
         {% endfor %}
+    {% endif %}
     {% endif %}
 ...
 ```
@@ -197,6 +205,7 @@ Edit templates to include lines described below:
     {% set contentData = [] %}
     {% set previewIdChildren = '' %}
     {% set sections_content = [] %}
+    {% if fsContentData is not empty %}
     {% if fsContentData.items is not empty %}
         {% for items in fsContentData.items[0].children %}
             {% if items.name == 'sup_content' %}
@@ -220,6 +229,7 @@ Edit templates to include lines described below:
                 {% endif %}
             {% endif %}
         {% endfor %}
+    {% endif %}
     {% endif %}
 ...
 ```
