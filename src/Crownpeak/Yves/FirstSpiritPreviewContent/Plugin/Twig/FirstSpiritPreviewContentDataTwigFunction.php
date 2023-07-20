@@ -1,4 +1,5 @@
 <?php
+
 namespace Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig;
 
 use Spryker\Service\Container\ContainerInterface;
@@ -7,21 +8,19 @@ use Spryker\Shared\TwigExtension\Dependency\Plugin\TwigPluginInterface;
 use Twig\TwigFunction;
 use Twig\Environment;
 
-/**
- * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentConfig getConfig()
- * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentFactory getFactory()
- */
+
 /**
  * Twig function go set Content Url and get content data.
+ * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentFactory getFactory()
  */
 class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implements TwigPluginInterface
 {
     /**
      * This is the name of the global function that will be available in the twig templates.
-     * usage: {{ firstSpiritCfcContentScriptData(id, type, language) }}
+     * usage: {{ firstSpiritContent(id, type, language) }}
      * @var string
      */
-    protected const FIRSTSPIRIT_CFC_CONTENT_SCRIPT_DATA = 'firstSpiritCfcContentScriptData';
+    protected const FIRSTSPIRIT_CFC_CONTENT_SCRIPT_DATA = 'firstSpiritContent';
 
     /**
      * @api
@@ -36,7 +35,7 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
         $twig->addFunction(
             new TwigFunction(
                 static::FIRSTSPIRIT_CFC_CONTENT_SCRIPT_DATA,
-                [$this, 'firstSpiritCfcContentScriptData']
+                [$this, 'firstSpiritContent']
             )
         );
 
@@ -50,10 +49,9 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
      * @param $language
      * @return array
      */
-    public function firstSpiritCfcContentScriptData($id, $type, $language): array
+    public function firstSpiritContent($id, $type, $language): array
     {
-        $url = $this->getConfig()->getContentEndpointScript();
-        $content = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($url, $id, $type, $language);
+        $content = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $language);
         return $content;
     }
 }

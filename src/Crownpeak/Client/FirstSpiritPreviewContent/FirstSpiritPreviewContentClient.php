@@ -15,18 +15,25 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
 {
     use LoggerTrait;
 
-    private string $referer = "";
+    private string $referer = '';
+    private string $apiHost = '';
 
     /**
-     * @param string $url
      * @param mixed $id
      * @param string $type
      * @param string $language
      * @return array
      * @throws FirstSpiritPreviewContentClientException
      */
-    public function fetchContentDataFromUrl(string $url, mixed $id, string $type, string $language): array
+    public function fetchContentDataFromUrl(mixed $id, string $type, string $language): array
     {
+        $url = $this->apiHost;
+
+        if (empty($url)) {
+            $this->getLogger()->error('[FirstSpiritContentRequester] No API host set');
+            throw new FirstSpiritPreviewContentClientException('No API host set');
+        }
+
         $query = http_build_query(
             array(
                 'id' => $id,
@@ -51,10 +58,11 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
         $data = array();
         $items = 0;
         if ($curlData === false) {
-            $this->getLogger()->info('[FirstSpiritContentRequester] URL Not Reachable: ' . $url);
+            $this->getLogger()->error('[FirstSpiritContentRequester] URL Not Reachable: ' . $url);
         } else {
             $data = json_decode($curlData, true);
             $items = count($data['items']);
+            // Log slot contents for debugging purposes
             if (!(empty($data['items'][0]))) {
                 foreach ($data['items'][0]['children'] as $slot) {
                     $this->getLogger()->info('[FirstSpiritContentRequester] Found ' . count($slot['children']) . ' sections for slot ' . $slot['name']);
@@ -80,15 +88,25 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
     }
 
     /**
+     * Sets the host of the CFC Frontend API backend.
+     * 
+     * @param string $host The value to set.
+     */
+    public function setApiHost(string $host): void
+    {
+        $this->apiHost = $host;
+    }
+
+    /**
      * @param string $url
      * @return string
      */
     private function getNextQueryParam(string $url)
     {
-        if (strpos($url, "?")) {
-            return "&";
+        if (strpos($url, '?')) {
+            return '&';
         } else {
-            return "?";
+            return '?';
         }
     }
 }
