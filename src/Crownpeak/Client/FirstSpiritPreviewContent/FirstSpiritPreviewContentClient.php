@@ -52,13 +52,20 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'X-Referrer: ' . $this->referer
         ]);
+        // Set timeout low so waiting for cURL does not let whole page time out
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+
         $curlData = curl_exec($ch);
+        if (curl_errno($ch)) {
+            $this->getLogger()->error('[FirstSpiritContentRequester] Failed to fetch: ' . $url . ' (cURL error ' . curl_errno($ch) . ')');
+        }
 
         // Do soft logging if the url is not reachable
         $data = array();
         $items = 0;
         if ($curlData === false) {
-            $this->getLogger()->error('[FirstSpiritContentRequester] URL Not Reachable: ' . $url);
+            $this->getLogger()->error('[FirstSpiritContentRequester] No data received: ' . $url);
         } else {
             $data = json_decode($curlData, true);
             $items = count($data['items']);
