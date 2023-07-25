@@ -43,6 +43,19 @@ for local url the value can be:
 http://host.docker.internal:3001/api/findPage
 ```
 
+
+**Add namespace in Yves EventDispatcherDependencyProvider**
+
+Add the following to your `src/Pyz/Yves/EventDispatcher/EventDispatcherDependencyProvider.php` file
+```
+use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\EventDispatcher\FirstSpiritPreviewContentEventDispatcherPlugin;
+```
+and in the function `protected function getEventDispatcherPlugins(): array {` add the following line
+```
+...
+new FirstSpiritPreviewContentEventDispatcherPlugin(),
+```
+
 **Add namespace in Yves TwigDependencyProvider**
 
 Add the following to your `src/Pyz/Yves/Twig/TwigDependencyProvider.php` file
