@@ -23,7 +23,7 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
 
     /**
      * This is the name of the global function that will be available in the twig templates.
-     * usage: {{ firstSpiritContent(id, type, language) }}
+     * usage: {{ firstSpiritContent(slotName) }}
      * @var string
      */
     protected const FIRSTSPIRIT_CFC_CONTENT_SCRIPT_DATA = 'firstSpiritContent';
@@ -57,14 +57,16 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
      * @param $slotName
      * @return string
      */
-    public function firstSpiritContent($id, $type, $language, $slotName): string
+    public function firstSpiritContent($slotName): string
     {
-        $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Getting data for: ' . $type . ' ' . $id . ' Slot: ' . $slotName);
+        // $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Getting data for: ' . $type . ' ' . $id . ' Slot: ' . $slotName);
+        // $data = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $language);
+        $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Getting data for slot: ' . $slotName);
 
-        $data = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $language);
-
+        $data = $this->getFactory()->getCurrentPage();
         if (empty($data) || count($data['items']) === 0) {
-            $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] No items found for: ' . $type . ' ' . $id);
+            // $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] No items found for: ' . $type . ' ' . $id);
+            $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] No items found');
             return $this->decorateSlot('', $slotName);
         }
         $pageContent = $data['items'][0];
