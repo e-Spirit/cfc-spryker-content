@@ -2,7 +2,9 @@
 
 namespace Crownpeak\Yves\FirstSpiritPreviewContent;
 
+use Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewService;
 use Crownpeak\Client\FirstSpiritPreviewContent\FirstSpiritPreviewContentClientInterface;
+use Crownpeak\Yves\FirstSpiritPreviewContent\Dependency\Client\FirstSpiritSessionClientBridgeInterface;
 use Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentDependencyProvider;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Yves\Kernel\AbstractFactory;
@@ -16,14 +18,30 @@ class FirstSpiritPreviewContentFactory extends AbstractFactory
     use LoggerTrait;
 
     private mixed $currentPageData;
+    /**
+     * @var FirstSpiritPreviewService 
+     */
+    private $previewService;
 
     public function __construct()
     {
+        $this->previewService = new FirstSpiritPreviewService($this);
         $this->currentPageData = NULL;
         $config = $this->getConfig();
         $apiHost = $config->getContentEndpointScript();
         $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CONTENT_JSON_FETCHER)->setApiHost($apiHost);
     }
+
+
+    /**
+     * @return FirstSpiritPreviewService The current instance of the FirstSpiritPreviewService.
+     */
+    public function getPreviewService(): FirstSpiritPreviewService
+    {
+        return $this->previewService;
+    }
+
+
     /**
      * @return \Crownpeak\Client\FirstSpiritPreviewContent\FirstSpiritPreviewContentClientInterface
      */
@@ -70,5 +88,16 @@ class FirstSpiritPreviewContentFactory extends AbstractFactory
         }
         $this->getLogger()->warning('[FirstSpiritPreviewContentFactory] No data set for current page');
         return NULL;
+    }
+
+
+
+    /**
+     * @return FirstSpiritSessionClientBridgeInterface
+     * @throws ContainerKeyNotFoundException
+     */
+    public function getSessionClient(): FirstSpiritSessionClientBridgeInterface
+    {
+        return $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CLIENT_SESSION);
     }
 }

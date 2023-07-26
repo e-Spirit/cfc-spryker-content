@@ -60,10 +60,11 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
      */
     public function firstSpiritAttributes($id, $type, $template, $title, $locale): string
     {
-        $this->getLogger()->info('[FirstSpiritPreviewContentAttributesTwigFunction] Setting attributes for: ' . $type . ' ' . $id);
+        $isPreview = $this->getFactory()->getPreviewService()->isPreview();
+
+        $this->getLogger()->info('[FirstSpiritPreviewContentAttributesTwigFunction] Setting attributes for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
 
         $data = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $locale);
-
 
         $previewId = NULL;
         if (empty($data) || count($data['items']) === 0) {
@@ -79,6 +80,11 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
                 // If data is found, save it to factory to access it in other Twig functions later
                 $this->getFactory()->setCurrentPage($data);
             }
+        }
+
+        // Only print attributes when in preview mode as they are only required by FE API in client
+        if (!$isPreview) {
+            return '';
         }
 
         return printf(
