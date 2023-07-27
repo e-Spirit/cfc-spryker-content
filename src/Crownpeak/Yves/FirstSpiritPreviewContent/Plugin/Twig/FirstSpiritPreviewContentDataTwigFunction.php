@@ -4,7 +4,6 @@ namespace Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig;
 
 use Spryker\Service\Container\ContainerInterface;
 use Spryker\Shared\Log\LoggerTrait;
-use Spryker\Shared\Twig\TwigFunctionProvider;
 use Spryker\Yves\Kernel\AbstractPlugin;
 use Spryker\Shared\TwigExtension\Dependency\Plugin\TwigPluginInterface;
 use Twig\TwigFunction;
@@ -26,7 +25,15 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
      * usage: {{ firstSpiritContent(slotName) }}
      * @var string
      */
-    protected const FIRSTSPIRIT_CFC_CONTENT_SCRIPT_DATA = 'firstSpiritContent';
+    protected const FIRSTSPIRIT_CONTENT = 'firstSpiritContent';
+
+    /**
+     * This is the name of the global function that will be available in the twig templates.
+     * usage: {{ firstSpiritContent(slotName) }}
+     * @var string
+     */
+    protected const FIRSTSPIRIT_RICHT_TEXT = 'firstSpiritRichText';
+
 
     /**
      * @api
@@ -41,8 +48,15 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
         $this->twig = $twig;
         $twig->addFunction(
             new TwigFunction(
-                static::FIRSTSPIRIT_CFC_CONTENT_SCRIPT_DATA,
+                static::FIRSTSPIRIT_CONTENT,
                 [$this, 'firstSpiritContent']
+            )
+        );
+
+        $twig->addFunction(
+            new TwigFunction(
+                static::FIRSTSPIRIT_RICHT_TEXT,
+                [$this, 'firstSpiritRichText']
             )
         );
 
@@ -50,22 +64,18 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
     }
 
     /**
-     * The data that will be queried and added to the twig template(s).
-     * @param $id
-     * @param $type
-     * @param $language
-     * @param $slotName
-     * @return string
+     * Returns the rendered content for the slot with the given name.
+     * Accesses the data based on what has been fetched earlier using FirstSpiritAttributesTwigFunction.
+     *
+     * @param string $slotName The name of the slot to render.
+     * @return string The content to be inserted into the DOM.
      */
     public function firstSpiritContent($slotName): string
     {
-        // $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Getting data for: ' . $type . ' ' . $id . ' Slot: ' . $slotName);
-        // $data = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $language);
         $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Getting data for slot: ' . $slotName);
 
         $data = $this->getFactory()->getCurrentPage();
         if (empty($data) || count($data['items']) === 0) {
-            // $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] No items found for: ' . $type . ' ' . $id);
             $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] No items found');
             return $this->decorateSlot('', $slotName);
         }
@@ -125,28 +135,56 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
 
 
     /**
-     * @param string $content
-     * @param string $previewId
+     * Render rich text with format.
+     *
+     * @param mixed $content The content as received from the API.
+     * @return string
+     */
+    public function firstSpiritRichText($content): string
+    {
+        $richTextUtil = new FirstSpiritRichTextUtil();
+        return $richTextUtil->renderRichText($content);
+    }
+
+    /**
+     * Decorates the section by wrapping it into a container with the preview ID set when in preview.
+     *
+     * @param string $content The sections content to wrap.
+     * @param string $previewId The preview ID of the section.
      * @return string
      */
     public function decorateSection(string $content, string $previewId = ''): string
     {
+        $isPreview = $this->getFactory()->getPreviewService()->isPreview();
         $decoratedContent = '<div';
-        if (!empty($previewId)) {
+        if ($isPreview && !empty($previewId)) {
             $decoratedContent .= ' data-preview-id="' . $previewId . '"';
         }
         return $decoratedContent . '>' . $content . '</div>';
     }
+
     /**
-     * @param string $content
-     * @param string $slotName
+     * Decorates a slot by wrapping it into a container with the slot name set when in preview.
+     *
+     * @param string $content The slots content to wrap.
+     * @param string $slotName The slot name.
      * @return string
      */
     public function decorateSlot(string $content, string $slotName): string
     {
-        return '<div data-fcecom-slot-name="' . $slotName . '">' . $content . '</div>';
+        $isPreview = $this->getFactory()->getPreviewService()->isPreview();
+        if ($isPreview) {
+            return '<div data-fcecom-slot-name="' . $slotName . '">' . $content . '</div>';
+        }
+        return $content;
     }
 
+    /**
+     * Maps the type of the given section to a template.
+     *
+     * @param mixed $section The section as retrieved from the API.
+     * @return string The name of the template to use for rendering.
+     */
     private function getTemplateForSection($section): string
     {
         switch ($section['sectionType']) {
