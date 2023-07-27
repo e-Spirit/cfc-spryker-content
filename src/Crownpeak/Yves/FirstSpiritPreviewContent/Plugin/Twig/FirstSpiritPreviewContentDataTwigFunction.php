@@ -124,11 +124,7 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
             //     ));
             // }
 
-            // if ($isContentEditable) {
             $renderedContent .= $this->decorateSection($renderedBlock, $section['previewId']);
-            // } else {
-            //     $renderedContent .= $renderedBlock;
-            // }
         }
         return $this->decorateSlot($renderedContent, $slotName);
     }
