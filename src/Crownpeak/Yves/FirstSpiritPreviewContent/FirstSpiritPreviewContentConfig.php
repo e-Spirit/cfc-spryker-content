@@ -26,4 +26,20 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
     {
         return $this->get(FirstSpiritPreviewConstants::FIRSTSPIRIT_PREVIEW_AUTHENTICATION_TOKEN, '');
     }
+
+    /**
+     * @return int Retrieves configuration value of cache duration for rendered templates.
+     */
+    public function getRenderedTemplateCacheDuration(): int
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_RENDERED_TEMPLATE_CACHE_DURATION, 0);
+    }
+
+    /**
+     * @return int Retrieves configuration value of cache duration for API responses.
+     */
+    public function getApiResponseCacheDuration(): int
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_API_RESPONSE_CACHE_DURATION, 0);
+    }
 }

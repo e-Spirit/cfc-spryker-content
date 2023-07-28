@@ -62,15 +62,26 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
     {
         $isPreview = $this->getFactory()->getPreviewService()->isPreview();
 
+        $cacheKey = md5($id . $type . $locale . ($isPreview ? 'preview' : 'release'));
+
         $this->getLogger()->info('[FirstSpiritPreviewContentAttributesTwigFunction] Setting attributes for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
 
-        try {
-            $data = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $locale);
-        } catch (\Throwable $th) {
-            $this->getLogger()->error('[FirstSpiritPreviewContentAttributesTwigFunction] Cannot get data for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
-            $this->getFactory()->getDataStore()->setCurrentPage(null);
-            $this->getFactory()->getDataStore()->setError($th);
-            return '';
+        $data = null;
+        if (!$isPreview && $this->getFactory()->getStorageClient()->hasApiResponse($cacheKey)) {
+            // Check for entry in cache
+            $data = $this->getFactory()->getStorageClient()->getApiResponse($cacheKey);
+        } else {
+            // If not in cache, query
+            try {
+                $data = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $locale);
+                $this->getFactory()->getStorageClient()->setApiResponse($cacheKey, $data);
+            } catch (\Throwable $th) {
+                $this->getLogger()->error('[FirstSpiritPreviewContentAttributesTwigFunction] Cannot get data for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
+                $this->getLogger()->error('[FirstSpiritPreviewContentAttributesTwigFunction] ' . $th->getMessage());
+                $this->getFactory()->getDataStore()->setCurrentPage(null);
+                $this->getFactory()->getDataStore()->setError($th);
+                return '';
+            }
         }
 
         $previewId = null;

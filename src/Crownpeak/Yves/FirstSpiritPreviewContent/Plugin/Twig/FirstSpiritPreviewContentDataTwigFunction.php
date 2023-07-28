@@ -109,30 +109,36 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
         $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Found ' . count($slotContent['children']) . ' sections to render');
 
         foreach ($slotContent['children'] as $section) {
+            $cacheKey = md5(json_encode($section));
+            if ($this->getFactory()->getStorageClient()->hasRenderedTemplate($cacheKey)) {
+                $cacheResult = $this->getFactory()->getStorageClient()->getRenderedTemplate($cacheKey);
+                $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Found in cache ' . $section['previewId'] . ' (cache key=' . $cacheKey . ')');
+                $renderedContent .= $this->decorateSection($cacheResult, $section['previewId']);
+            } else {
+                $renderedBlock = '';
+                // try {
+                $template = $this->getTemplateForSection($section);
+                $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Attempting to render section ' . $section['previewId'] . ' with template ' . $template);
+                $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
+                    'fsData' => $section,
+                    'template' => $template
+                ]);
+                $cacheResult = $this->getFactory()->getStorageClient()->setRenderedTemplate($cacheKey, $renderedBlock);
+                $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Finished rendering section ' . $section['previewId']);
+                // } catch (\Throwable $throwable) {
+                //     $this->getLogger()->error('[FirstSpiritPreviewContentDataTwigFunction] Failed to render section ' . $section['previewId']);
 
-            $renderedBlock = '';
-            // try {
-            $template = $this->getTemplateForSection($section);
-            $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Attempting to render section ' . $section['previewId'] . ' with template ' . $template);
-            $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
-                'fsData' => $section,
-                'template' => $template
-            ]);
-            $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Finished rendering section' . $section['previewId']);
-            // } catch (\Throwable $throwable) {
-            //     $this->getLogger()->error('[FirstSpiritPreviewContentDataTwigFunction] Failed to render section ' . $section['previewId']);
-
-            //     //     // if ($this->factory->getConfig()->shouldDisplayBlockRenderErrors()) {
-            //     //     //     $renderedBlock = (new RenderErrorFormatter($twig))->format($throwable);
-            //     //     // }
-            //     $this->getLogger()->error(sprintf(
-            //         "[FirstSpiritPreviewContentDataTwigFunction] Error during rendering of CMS blocks with options: %s\n%s",
-            //         $throwable->getMessage(),
-            //         $throwable->getTraceAsString()
-            //     ));
-            // }
-
-            $renderedContent .= $this->decorateSection($renderedBlock, $section['previewId']);
+                //     //     // if ($this->factory->getConfig()->shouldDisplayBlockRenderErrors()) {
+                //     //     //     $renderedBlock = (new RenderErrorFormatter($twig))->format($throwable);
+                //     //     // }
+                //     $this->getLogger()->error(sprintf(
+                //         "[FirstSpiritPreviewContentDataTwigFunction] Error during rendering of CMS blocks with options: %s\n%s",
+                //         $throwable->getMessage(),
+                //         $throwable->getTraceAsString()
+                //     ));
+                // }
+                $renderedContent .= $this->decorateSection($renderedBlock, $section['previewId']);
+            }
         }
         return $this->decorateSlot($renderedContent, $slotName);
     }
