@@ -74,7 +74,15 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
     {
         $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Getting data for slot: ' . $slotName);
 
-        $data = $this->getFactory()->getCurrentPage();
+        $data = $this->getFactory()->getDataStore()->getCurrentPage();
+        if (is_null($data)) {
+            $error = $this->getFactory()->getDataStore()->getError();
+            if (!is_null($error)) {
+                $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Rendering error for slot: ' . $slotName);
+                return $this->decorateSlot($this->getErrorMessage($error), $slotName);
+            }
+        }
+
         if (empty($data) || count($data['items']) === 0) {
             $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] No items found');
             return $this->decorateSlot('', $slotName);
@@ -188,5 +196,17 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
                 return 'fs-text-image';
         }
         return 'fs-data-visualizer';
+    }
+
+    /**
+     * Constructs an error message to display from the given error.
+     */
+    private function getErrorMessage(\Throwable $th): string
+    {
+        $isPreview = $this->getFactory()->getPreviewService()->isPreview();
+        if (!$isPreview) {
+            return '';
+        }
+        return '<div style="text-align: center"><h2>Error</h2>' . $th->getMessage() . '</div>';
     }
 }

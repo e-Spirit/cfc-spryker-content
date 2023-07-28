@@ -57,8 +57,16 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
         $curlData = curl_exec($ch);
-        if (curl_errno($ch)) {
-            $this->getLogger()->error('[FirstSpiritContentRequester] Failed to fetch: ' . $url . ' (cURL error ' . curl_errno($ch) . ')');
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErrNo = curl_errno($ch);
+
+        if ($httpCode >= 400) {
+            $this->getLogger()->error('[FirstSpiritContentRequester] Failed to fetch: ' . $url . ' (HTTP status ' . $httpCode . ')');
+            throw new FirstSpiritPreviewContentClientException('Failed to fetch (HTTP status ' . $httpCode . ')');
+        }
+        if ($curlErrNo) {
+            $this->getLogger()->error('[FirstSpiritContentRequester] Failed to fetch: ' . $url . ' (cURL error ' . $curlErrNo . ')');
+            throw new FirstSpiritPreviewContentClientException('Failed to fetch (cURL error ' . $curlErrNo . ')');
         }
 
         // Do soft logging if the url is not reachable
