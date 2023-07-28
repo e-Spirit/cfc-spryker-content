@@ -37,6 +37,8 @@ and then:
 
 // ----------- FirstSpirit Preview Content Configuration
 $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_CONTENT_SCRIPT_URL] = '<ADD Content Endpoint HOST (without parameters)>';
+$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_RENDERED_TEMPLATE_CACHE_DURATION] = '<Cache duration for rendered templates>';
+$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_API_RESPONSE_CACHE_DURATION] = '<Cache duration for FE API responses>';
 ```
 for local url the value can be:
 ```
