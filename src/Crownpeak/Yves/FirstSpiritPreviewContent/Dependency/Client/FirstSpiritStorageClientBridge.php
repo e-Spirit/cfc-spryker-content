@@ -33,11 +33,11 @@ class FirstSpiritStorageClientBridge
         $this->storageClient = $storageClient;
 
         $this->renderedTemplateTtl = static::RENDERED_TEMPLATE_DEFAULT_TTL;
-        if (is_int($config->getRenderedTemplateCacheDuration()) && $config->getRenderedTemplateCacheDuration() > 0) {
+        if (is_int($config->getRenderedTemplateCacheDuration())) {
             $this->renderedTemplateTtl = $config->getRenderedTemplateCacheDuration();
         }
         $this->apiResponseTtl = static::API_RESPONSE_DEFAULT_TTL;
-        if (is_int($config->getApiResponseCacheDuration()) && $config->getApiResponseCacheDuration() > 0) {
+        if (is_int($config->getApiResponseCacheDuration())) {
             $this->apiResponseTtl = $config->getApiResponseCacheDuration();
         }
     }
@@ -61,7 +61,9 @@ class FirstSpiritStorageClientBridge
      */
     public function setRenderedTemplate(string $key, string $renderedTemplate)
     {
-        $this->storageClient->set(static::RENDERED_TEMPLATE_PREFIX . $key, $renderedTemplate, $this->renderedTemplateTtl);
+        if ($this->renderedTemplateTtl > 0) {
+            $this->storageClient->set(static::RENDERED_TEMPLATE_PREFIX . $key, $renderedTemplate, $this->renderedTemplateTtl);
+        }
     }
 
     /**
@@ -98,7 +100,9 @@ class FirstSpiritStorageClientBridge
      */
     public function setApiResponse(string $key, mixed $response)
     {
-        $this->storageClient->set(static::API_RESPONSE_PREFIX . $key, json_encode($response), $this->apiResponseTtl);
+        if ($this->apiResponseTtl > 0) {
+            $this->storageClient->set(static::API_RESPONSE_PREFIX . $key, json_encode($response), $this->apiResponseTtl);
+        }
     }
 
     /**
