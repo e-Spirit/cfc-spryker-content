@@ -72,7 +72,9 @@ class FirstSpiritStorageClientBridge
      */
     public function hasRenderedTemplate(string $key): bool
     {
-
+        if ($this->renderedTemplateTtl <= 0) {
+            return false;
+        }
         $result = $this->getRenderedTemplate($key);
         return is_string($result) && strlen($result) > 0;
     }
@@ -107,6 +109,9 @@ class FirstSpiritStorageClientBridge
      */
     public function hasApiResponse(string $key): bool
     {
+        if ($this->apiResponseTtl <= 0) {
+            return false;
+        }
         $result = $this->getApiResponse($key);
         return isset($result);
     }
