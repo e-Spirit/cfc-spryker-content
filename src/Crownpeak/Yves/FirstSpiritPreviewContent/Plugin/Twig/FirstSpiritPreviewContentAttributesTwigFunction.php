@@ -71,7 +71,7 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
             // Check for entry in cache
             $data = $this->getFactory()->getStorageClient()->getApiResponse($cacheKey);
         } else {
-            // If not in cache, query
+            // If not in cache or in preview mode, query
             try {
                 $data = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $locale);
                 $this->getFactory()->getStorageClient()->setApiResponse($cacheKey, $data);
