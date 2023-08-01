@@ -13,6 +13,7 @@ use Twig\Environment;
 /**
  * Twig function go set Content Url and get content data.
  * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentFactory getFactory()
+ * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentConfig getConfig()
  */
 class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implements TwigPluginInterface
 {
@@ -116,27 +117,34 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
                 $renderedContent .= $this->decorateSection($cacheResult, $section['previewId']);
             } else {
                 $renderedBlock = '';
-                // try {
-                $template = $this->getTemplateForSection($section);
-                $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Attempting to render section ' . $section['previewId'] . ' with template ' . $template);
-                $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
-                    'fsData' => $section,
-                    'template' => $template
-                ]);
-                $cacheResult = $this->getFactory()->getStorageClient()->setRenderedTemplate($cacheKey, $renderedBlock);
-                $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Finished rendering section ' . $section['previewId']);
-                // } catch (\Throwable $throwable) {
-                //     $this->getLogger()->error('[FirstSpiritPreviewContentDataTwigFunction] Failed to render section ' . $section['previewId']);
+                try {
+                    $template = $this->getTemplateForSection($section);
+                    $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Attempting to render section ' . $section['previewId'] . ' with template ' . $template);
+                    $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
+                        'fsData' => $section,
+                        'template' => $template
+                    ]);
+                    $cacheResult = $this->getFactory()->getStorageClient()->setRenderedTemplate($cacheKey, $renderedBlock);
+                    $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Finished rendering section ' . $section['previewId']);
+                } catch (\Throwable $th) {
+                    $this->getLogger()->error(sprintf(
+                        '[FirstSpiritPreviewContentDataTwigFunction] Error during rendering of section %s: %s\n%s',
+                        $section['previewId'],
+                        $th->getMessage(),
+                        $th->getTraceAsString()
+                    ));
 
-                //     //     // if ($this->factory->getConfig()->shouldDisplayBlockRenderErrors()) {
-                //     //     //     $renderedBlock = (new RenderErrorFormatter($twig))->format($throwable);
-                //     //     // }
-                //     $this->getLogger()->error(sprintf(
-                //         "[FirstSpiritPreviewContentDataTwigFunction] Error during rendering of CMS blocks with options: %s\n%s",
-                //         $throwable->getMessage(),
-                //         $throwable->getTraceAsString()
-                //     ));
-                // }
+
+                    if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
+                        // If errors should be displayed, re-throw so error page with details is displayed
+                        throw $th;
+                    }
+                    $isPreview = $this->getFactory()->getPreviewService()->isPreview();
+                    if ($isPreview) {
+                        // In preview, render basic information
+                        $renderedContent = $this->getErrorMessage($th);
+                    }
+                }
                 $renderedContent .= $this->decorateSection($renderedBlock, $section['previewId']);
             }
         }

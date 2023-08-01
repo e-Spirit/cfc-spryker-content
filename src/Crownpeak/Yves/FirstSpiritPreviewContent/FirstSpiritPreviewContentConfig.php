@@ -42,4 +42,12 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
     {
         return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_API_RESPONSE_CACHE_DURATION, 0);
     }
+
+    /**
+     * @return bool Retrieves configuration value of whether to display CMS block rendering errors.
+     */
+    public function shouldDisplayBlockRenderErrors(): bool
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_DISPLAY_BLOCK_RENDER_ERRORS, false);
+    }
 }
