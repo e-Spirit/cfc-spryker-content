@@ -50,6 +50,10 @@ class FirstSpiritPreviewContentEventDispatcherPlugin extends AbstractPlugin impl
                     return;
                 }
                 $request = $event->getRequest();
+
+                $previewService = $this->getFactory()->getPreviewService();
+                $previewService->isPreviewAuthenticationRequested($request);
+
                 $session = $event->getRequest()->getSession();
                 // If there is already a value in the session, use it as it will be the one from CC
                 if ($session->has(self::HEADER_REFERER) && is_string($request->headers->get(self::HEADER_REFERER))) {

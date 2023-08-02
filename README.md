@@ -36,12 +36,13 @@ and then:
 ...
 
 // ----------- FirstSpirit Preview Content Configuration
-$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_FRONTEND_API_SERVER_URL] = '<ADD Content Endpoint HOST (without parameters)>';
+$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_CONTENT_SCRIPT_URL] = '<ADD Content Endpoint HOST (without parameters)>';
 ```
 for local url the value can be:
 ```
 http://host.docker.internal:3001/api/findPage
 ```
+
 
 **Add namespace in Yves EventDispatcherDependencyProvider**
 
@@ -60,10 +61,12 @@ new FirstSpiritPreviewContentEventDispatcherPlugin(),
 Add the following to your `src/Pyz/Yves/Twig/TwigDependencyProvider.php` file
 ```
 use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewContentDataTwigFunction;
+use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewContentAttributesTwigFunction;
 ```
 and in the function `protected function getTwigPlugins(): array {` add the following line
 ```
 new FirstSpiritPreviewContentDataTwigFunction(),
+new FirstSpiritPreviewContentAttributesTwigFunction(),
 ```
 
 **Add twig variable in template(s)**
@@ -71,221 +74,115 @@ new FirstSpiritPreviewContentDataTwigFunction(),
 Edit templates to include lines described below:
 
 
-**Homepage template:** after this line for `src/Pyz/Yves/HomePage/Theme/default/views/home/home.twig` file:
-```
-{% block container %}
-```
-```
-    {% set placeholder_sup_content = '' %}
-    {% set placeholder_sub_content = '' %}
-    {% set fsContentData = firstSpiritCfcContentScriptData(data.product.idProductAbstract, 'product', data.appLocale ) %}
-    {% set contentData = [] %}
-    {% set previewIdChildren = '' %}
-    {% set sections_content = [] %}
-    {% if fsContentData is not empty %}
-    {% if fsContentData.items is not empty %}
-        {% for items in fsContentData.items[0].children %}
-            {{ dump(items) }}
-            {% if items.name == 'stage' %}
-                {% if items.children|length > 0 %}
-                    {{ dump(items.children) }}
-                    {% for key, sections in items.children %}
-                        {% set previewIdChildren = items.children[key].previewId %}
-                        {% set contentData = items.children[key].data|json_encode() %}
-                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
-                        {% set placeholder_sup_content = sections_content|join(' ') %}
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-            {% if items.name == 'content' %}
-                {% if items.children|length > 0 %}
-                    {% for key, sections in items.children %}
-                        {% set previewIdChildren = items.children[key].previewId %}
-                        {% set contentData = items.children[key].data|json_encode() %}
-                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
-                        {% set placeholder_sub_content = sections_content|join(' ') %}
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-    {% endif %}
-...
-```
-
 **Product template:** after this line for `src/Pyz/Yves/ProductDetailPage/Theme/default/views/pdp/pdp.twig` file:
 ```
+{% block headStyles %}
+    {{ parent() }}
+    <link itemprop="url" href="{{ data.productUrl }}">
+{% endblock %}
+
+{% block attributes %}
+    {{ parent() }}
+    {{ firstSpiritAttributes(data.product.idProductAbstract, "product", "product", data.title, data.appLocale) }}
+{% endblock %}
+{% block pageInfo %}
+// ...
+
 {% block content %}
-```
-```
-    {% set placeholder_sup_content = '' %}
-    {% set placeholder_sub_content = '' %}
-    {% set fsContentData = firstSpiritCfcContentScriptData(data.product.idProductAbstract, 'product', data.appLocale ) %}
-    {% set contentData = [] %}
-    {% set previewIdChildren = '' %}
-    {% set sections_content = [] %}
-    {% if fsContentData is not empty %}
-    {% if fsContentData.items is not empty %}
-        {% for items in fsContentData.items[0].children %}
-            {% if items.name == 'sup_content' %}
-                {% if items.children|length > 0 %}
-                    {% for key, sections in items.children %}
-                        {% set previewIdChildren = items.children[key].previewId %}
-                        {% set contentData = items.children[key].data|json_encode() %}
-                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
-                        {% set placeholder_sup_content = sections_content|join(' ') %}
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-            {% if items.name == 'sub_content' %}
-                {% if items.children|length > 0 %}
-                    {% for key, sections in items.children %}
-                        {% set previewIdChildren = items.children[key].previewId %}
-                        {% set contentData = items.children[key].data|json_encode() %}
-                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
-                        {% set placeholder_sub_content = sections_content|join(' ') %}
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-    {% endif %}
-...
+    <div class="container__inner">
+        {{ firstSpiritContent('sup_content') | raw }}
+    // ...
+
+    </div>
+
+    {{ firstSpiritContent('sub_content') | raw }}
+
+{% endblock %}
 ```
 
 **Catalog template:** after this line for `src/Pyz/Yves/CatalogPage/Theme/default/templates/page-layout-catalog/page-layout-catalog.twig` file:
 ```
+{% define data = {
+    // ...
+} %}
+
+{% block attributes %}
+    {{ parent() }}
+    {{ firstSpiritAttributes(data.category.id_category, "category", "category", data.title, data.appLocale) }}
+{% endblock %}
+
 {% block container %}
-```
-```
-    {% set placeholder_sup_content = '' %}
-    {% set placeholder_sub_content = '' %}
-    {% set fsContentData = firstSpiritCfcContentScriptData(data.category.id_category, 'category', app.locale) %}
-    {% set contentData = [] %}
-    {% set previewIdChildren = '' %}
-    {% set sections_content = [] %}
-    {% if fsContentData is not empty %}
-    {% if fsContentData.items is not empty %}
-        {% for items in fsContentData.items[0].children %}
-            {% if items.name == 'sup_content' %}
-                {% if items.children|length > 0 %}
-                    {% for key, sections in items.children %}
-                        {% set previewIdChildren = items.children[key].previewId %}
-                        {% set contentData = items.children[key].data|json_encode() %}
-                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
-                        {% set placeholder_sup_content = sections_content|join(' ') %}
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-            {% if items.name == 'sub_content' %}
-                {% if items.children|length > 0 %}
-                    {% for key, sections in items.children %}
-                        {% set previewIdChildren = items.children[key].previewId %}
-                        {% set contentData = items.children[key].data|json_encode() %}
-                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
-                        {% set placeholder_sub_content = sections_content|join(' ') %}
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-    {% endif %}
-...
+
+// ...
+
+<main class="container__inner">
+
+        {{ firstSpiritContent('sup_content') | raw }}
+
+        // ...
+
+        </main>
+        {{ firstSpiritContent('sub_content') | raw }}
+    </div>
+{% endblock %}
 ```
 
 **CMS page templates:** after this line for `src/Pyz/Shared/Cms/Theme/default/templates/placeholders-title-content/placeholders-title-content.twig` and
 `src/Pyz/Shared/Cms/Theme/default/templates/placeholders-title-content-slot/placeholders-title-content-slot.twig` files:
 ```
+{% define data = {
+    // ...
+} %}
+
+{% block attributes %}
+    {{ parent() }}
+    {{ firstSpiritAttributes(data.idCmsPage, "content", "content", data.title, data.appLocale) }}
+{% endblock %}
+
+// ...
+
 {% block content %}
-```
-```
-    {% set placeholder_sup_content = '' %}
-    {% set placeholder_sub_content = '' %}
-    {% set fsContentData = firstSpiritCfcContentScriptData(_view.idCmsPage, 'content', data.appLocale ) %}
-    {% set contentData = [] %}
-    {% set previewIdChildren = '' %}
-    {% set sections_content = [] %}
-    {% if fsContentData is not empty %}
-    {% if fsContentData.items is not empty %}
-        {% for items in fsContentData.items[0].children %}
-            {% if items.name == 'sup_content' %}
-                {% if items.children|length > 0 %}
-                    {% for key, sections in items.children %}
-                        {% set previewIdChildren = items.children[key].previewId %}
-                        {% set contentData = items.children[key].data|json_encode() %}
-                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
-                        {% set placeholder_sup_content = sections_content|join(' ') %}
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-            {% if items.name == 'sub_content' %}
-                {% if items.children|length > 0 %}
-                    {% for key, sections in items.children %}
-                        {% set previewIdChildren = items.children[key].previewId %}
-                        {% set contentData = items.children[key].data|json_encode() %}
-                        {% set sections_content = sections_content|merge(['<div data-preview-id="' ~ previewIdChildren ~ '">' ~ contentData ~ '</div>']) %}
-                        {% set placeholder_sub_content = sections_content|join(' ') %}
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-    {% endif %}
-...
-```
-_**and in these lines for all templates mentioned above not including homepage:**_
+    {{ firstSpiritContent('sup_content') | raw }}
 
-add **{{ placeholder_sup_content }}** variable.
-```
- <div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="sup_content">
-   
- </div>
-```
-```
-<div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="sup_content">
-   {{ placeholder_sup_content | raw }}
- </div>
+// ...
+
+    {{ firstSpiritContent('sub_content') | raw }}
+
+    <div class="box">
+        {% cms_slot 'slt-8' with {
+            idCmsPage: data.idCmsPage,
+        } %}
+    </div>
+{% endblock %}
 ```
 
-add **{{ placeholder_sub_content }}** variable.
+
+**CMS page templates:** after this line for `src/Pyz/Yves/HomePage/Theme/default/views/home/home.twig` files:
+```
+{% extends template('page-layout-main') %}
+
+
+{% block attributes %}
+    {{ parent() }}
+    {{ firstSpiritAttributes("homepage", "content", "homepage", data.title, data.appLocale) }}
+{% endblock %}
+
+// ...
+
+            {% block content %}
+                {{ firstSpiritContent('stage') | raw }}
+
+                {% cms_slot 'slt-3' %}
+
+                {{ firstSpiritContent('content') | raw }}
+
+            {% endblock %}
+        </main>
+    </div>
+{% endblock %}
 
 ```
- <div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="sub_content">
- 
- </div>
-```
-```
- <div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="sub_content">
-   {{ placeholder_sub_content | raw }}
- </div>
-```
 
-_For **homepage** should be:_
-
-add **{{ placeholder_sup_content }}** variable.
-```
-<div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="stage">
-     
-</div>
-```
-```
-<div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="stage">
-   {{ placeholder_sup_content | raw }}
-</div>
-```
-
-add **{{ placeholder_sub_content }}** variable.
-
-```
-<div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="content">
- 
-</div>
-```
-```
-<div style="margin: 20px; padding: 20px;" data-fcecom-slot-name="content">
-    {{ placeholder_sub_content | raw }}
-</div>
-```
 
 ## Testing
 To test a particular branch in your Spryker installation replace _{branchname}_ in the command below:

@@ -9,13 +9,12 @@ namespace Crownpeak\Client\FirstSpiritPreviewContent;
 interface FirstSpiritPreviewContentClientInterface
 {
     /**
-     * @param string $url
      * @param mixed $id
      * @param string $type
      * @param string $language
      * @return array
      */
-    public function fetchContentDataFromUrl(string $url, mixed $id, string $type, string $language): array;
+    public function fetchContentDataFromUrl(mixed $id, string $type, string $language): array;
 
 
     /**
@@ -24,4 +23,11 @@ interface FirstSpiritPreviewContentClientInterface
      * @param string $referer The value to set.
      */
     public function setReferer(string $referer): void;
+
+    /**
+     * Sets the host of the CFC Frontend API backend.
+     * 
+     * @param string $host The value to set.
+     */
+    public function setApiHost(string $host): void;
 }
