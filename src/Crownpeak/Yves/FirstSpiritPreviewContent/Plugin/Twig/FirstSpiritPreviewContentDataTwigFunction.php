@@ -2,6 +2,7 @@
 
 namespace Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig;
 
+use Crownpeak\Yves\FirstSpiritPreviewContent\Exception\FirstSpiritPreviewContentTemplateException;
 use Spryker\Service\Container\ContainerInterface;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Yves\Kernel\AbstractPlugin;
@@ -118,11 +119,18 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
             } else {
                 $renderedBlock = '';
                 try {
-                    $template = $this->getTemplateForSection($section);
+                    $fullTemplate = $this->getTemplateForSection($section);
+                    $splitTemplate = explode('/', $fullTemplate);
+                    if (count($splitTemplate) !== 2) {
+                        throw new FirstSpiritPreviewContentTemplateException('Invalid template path ' . $fullTemplate);
+                    }
+                    $templateModule = $splitTemplate[0];
+                    $template = $splitTemplate[1];
                     $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Attempting to render section ' . $section['previewId'] . ' with template ' . $template);
                     $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
                         'fsData' => $section,
-                        'template' => $template
+                        'template' => $template,
+                        'templateModule' => $templateModule
                     ]);
                     $cacheResult = $this->getFactory()->getStorageClient()->setRenderedTemplate($cacheKey, $renderedBlock);
                     $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Finished rendering section ' . $section['previewId']);
@@ -199,17 +207,28 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
 
     /**
      * Maps the type of the given section to a template.
+     * Uses configured mapping array.
      *
      * @param mixed $section The section as retrieved from the API.
      * @return string The name of the template to use for rendering.
      */
     private function getTemplateForSection($section): string
     {
-        switch ($section['sectionType']) {
-            case 'text_image':
-                return 'fs-text-image';
+        $mapping = $this->getConfig()->getTemplateMapping();
+        $sectionType = $section['sectionType'];
+        $fallbackMappingKey = '*';
+        if (array_key_exists($sectionType, $mapping)) {
+            $templateName = $mapping[$sectionType];
+            $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Using ' . $templateName . ' for ' . $sectionType);
+            return $templateName;
+        } else if (array_key_exists($fallbackMappingKey, $mapping)) {
+            $fallbackTemplateName = $mapping[$fallbackMappingKey];
+            $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Using fallback mapping for ' . $sectionType);
+            return $fallbackTemplateName;
+        } else {
+            $this->getLogger()->warning('[FirstSpiritPreviewContentDataTwigFunction] No mapping found for ' . $sectionType);
+            throw new FirstSpiritPreviewContentTemplateException('No mapping found for ' . $sectionType);
         }
-        return 'fs-data-visualizer';
     }
 
     /**
