@@ -88,7 +88,7 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
         }
 
         return printf(
-            'data-fs-preview-id="%s" data-fs-page-id="%s" data-fs-page-type="%s" data-fs-page-template="%s" data-fs-name-{{ %s }}="{{ %s }}" data-fs-lang="{{ %s }}"',
+            'data-fs-preview-id="%s" data-fs-page-id="%s" data-fs-page-type="%s" data-fs-page-template="%s" data-fs-name-%s="%s" data-fs-lang="%s"',
             $previewId,
             $id,
             $type,
