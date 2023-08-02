@@ -63,7 +63,7 @@ class FirstSpiritRichTextUtil
           $style .= ' font-weight: bold;';
           break;
         case 'italic':
-          $style .= ' text-style: italic;';
+          $style .= ' font-style: italic;';
           break;
         case 'subline':
           $style .= ' font-weight: bold; font-size: 1.5em;';
