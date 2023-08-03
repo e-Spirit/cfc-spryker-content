@@ -199,17 +199,6 @@ Edit templates to include lines described below:
 
 ```
 
-**Add twig variable in Main page > page-layout-main.twig**
-
-Add the following to your `src/Pyz/Yves/ShopUi/Theme/default/templates/page-layout-main/page-layout-main.twig` file at the end of the document after the `{ firstSpiritCfcScriptUrl|raw }}` from the `cfc-spryker-config` module.
-```
-{% block footerScripts %}
-    {{ firstSpiritCfcScriptUrl|raw }}
-    {{ firstSpiritContentChangeCallbacks | raw }}
-{% endblock %}
-```
-
-
 ## Testing
 To test a particular branch in your Spryker installation replace _{branchname}_ in the command below:
 ```
