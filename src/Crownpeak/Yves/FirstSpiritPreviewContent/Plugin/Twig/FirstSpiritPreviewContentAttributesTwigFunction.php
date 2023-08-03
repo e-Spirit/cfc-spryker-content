@@ -62,11 +62,29 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
     {
         $isPreview = $this->getFactory()->getPreviewService()->isPreview();
 
+        $cacheKey = md5($id . $type . $locale . ($isPreview ? 'preview' : 'release'));
+
         $this->getLogger()->info('[FirstSpiritPreviewContentAttributesTwigFunction] Setting attributes for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
 
-        $data = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $locale);
+        $data = null;
+        if (!$isPreview && $this->getFactory()->getStorageClient()->hasApiResponse($cacheKey)) {
+            // Check for entry in cache
+            $data = $this->getFactory()->getStorageClient()->getApiResponse($cacheKey);
+        } else {
+            // If not in cache or in preview mode, query
+            try {
+                $data = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $locale);
+                $this->getFactory()->getStorageClient()->setApiResponse($cacheKey, $data);
+            } catch (\Throwable $th) {
+                $this->getLogger()->error('[FirstSpiritPreviewContentAttributesTwigFunction] Cannot get data for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
+                $this->getLogger()->error('[FirstSpiritPreviewContentAttributesTwigFunction] ' . $th->getMessage());
+                $this->getFactory()->getDataStore()->setCurrentPage(null);
+                $this->getFactory()->getDataStore()->setError($th);
+                return '';
+            }
+        }
 
-        $previewId = NULL;
+        $previewId = null;
         if (empty($data) || count($data['items']) === 0) {
             $this->getLogger()->info('[FirstSpiritPreviewContentAttributesTwigFunction] No items found for: ' . $type . ' ' . $id);
         } else {
@@ -78,7 +96,7 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
                 $this->getLogger()->error('[FirstSpiritPreviewContentAttributesTwigFunction] No preview ID found');
             } else {
                 // If data is found, save it to factory to access it in other Twig functions later
-                $this->getFactory()->setCurrentPage($data);
+                $this->getFactory()->getDataStore()->setCurrentPage($data);
             }
         }
 

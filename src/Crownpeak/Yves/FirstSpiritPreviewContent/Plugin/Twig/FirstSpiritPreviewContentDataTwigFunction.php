@@ -13,6 +13,7 @@ use Twig\Environment;
 /**
  * Twig function go set Content Url and get content data.
  * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentFactory getFactory()
+ * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentConfig getConfig()
  */
 class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implements TwigPluginInterface
 {
@@ -74,7 +75,15 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
     {
         $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Getting data for slot: ' . $slotName);
 
-        $data = $this->getFactory()->getCurrentPage();
+        $data = $this->getFactory()->getDataStore()->getCurrentPage();
+        if (is_null($data)) {
+            $error = $this->getFactory()->getDataStore()->getError();
+            if (!is_null($error)) {
+                $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Rendering error for slot: ' . $slotName);
+                return $this->decorateSlot($this->getErrorMessage($error), $slotName);
+            }
+        }
+
         if (empty($data) || count($data['items']) === 0) {
             $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] No items found');
             return $this->decorateSlot('', $slotName);
@@ -101,30 +110,43 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
         $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Found ' . count($slotContent['children']) . ' sections to render');
 
         foreach ($slotContent['children'] as $section) {
+            $cacheKey = md5(json_encode($section));
+            if ($this->getFactory()->getStorageClient()->hasRenderedTemplate($cacheKey)) {
+                $cacheResult = $this->getFactory()->getStorageClient()->getRenderedTemplate($cacheKey);
+                $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Found in cache ' . $section['previewId'] . ' (cache key=' . $cacheKey . ')');
+                $renderedContent .= $this->decorateSection($cacheResult, $section['previewId']);
+            } else {
+                $renderedBlock = '';
+                try {
+                    $template = $this->getTemplateForSection($section);
+                    $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Attempting to render section ' . $section['previewId'] . ' with template ' . $template);
+                    $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
+                        'fsData' => $section,
+                        'template' => $template
+                    ]);
+                    $cacheResult = $this->getFactory()->getStorageClient()->setRenderedTemplate($cacheKey, $renderedBlock);
+                    $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Finished rendering section ' . $section['previewId']);
+                } catch (\Throwable $th) {
+                    $this->getLogger()->error(sprintf(
+                        '[FirstSpiritPreviewContentDataTwigFunction] Error during rendering of section %s: %s\n%s',
+                        $section['previewId'],
+                        $th->getMessage(),
+                        $th->getTraceAsString()
+                    ));
 
-            $renderedBlock = '';
-            // try {
-            $template = $this->getTemplateForSection($section);
-            $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Attempting to render section ' . $section['previewId'] . ' with template ' . $template);
-            $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
-                'fsData' => $section,
-                'template' => $template
-            ]);
-            $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Finished rendering section' . $section['previewId']);
-            // } catch (\Throwable $throwable) {
-            //     $this->getLogger()->error('[FirstSpiritPreviewContentDataTwigFunction] Failed to render section ' . $section['previewId']);
 
-            //     //     // if ($this->factory->getConfig()->shouldDisplayBlockRenderErrors()) {
-            //     //     //     $renderedBlock = (new RenderErrorFormatter($twig))->format($throwable);
-            //     //     // }
-            //     $this->getLogger()->error(sprintf(
-            //         "[FirstSpiritPreviewContentDataTwigFunction] Error during rendering of CMS blocks with options: %s\n%s",
-            //         $throwable->getMessage(),
-            //         $throwable->getTraceAsString()
-            //     ));
-            // }
-
-            $renderedContent .= $this->decorateSection($renderedBlock, $section['previewId']);
+                    if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
+                        // If errors should be displayed, re-throw so error page with details is displayed
+                        throw $th;
+                    }
+                    $isPreview = $this->getFactory()->getPreviewService()->isPreview();
+                    if ($isPreview) {
+                        // In preview, render basic information
+                        $renderedContent = $this->getErrorMessage($th);
+                    }
+                }
+                $renderedContent .= $this->decorateSection($renderedBlock, $section['previewId']);
+            }
         }
         return $this->decorateSlot($renderedContent, $slotName);
     }
@@ -188,5 +210,17 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
                 return 'fs-text-image';
         }
         return 'fs-data-visualizer';
+    }
+
+    /**
+     * Constructs an error message to display from the given error.
+     */
+    private function getErrorMessage(\Throwable $th): string
+    {
+        $isPreview = $this->getFactory()->getPreviewService()->isPreview();
+        if (!$isPreview) {
+            return '';
+        }
+        return '<div style="text-align: center"><h2>Error</h2>' . $th->getMessage() . '</div>';
     }
 }
