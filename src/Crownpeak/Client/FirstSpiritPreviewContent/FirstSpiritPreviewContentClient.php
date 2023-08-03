@@ -18,29 +18,74 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
     private string $referer = '';
     private string $apiHost = '';
 
+    public function __construct(string $apiHost)
+    {
+        $this->apiHost = $apiHost;
+    }
+
     /**
      * @param mixed $id
      * @param string $type
-     * @param string $language
+     * @param string $locale
      * @return array
      * @throws FirstSpiritPreviewContentClientException
      */
-    public function fetchContentDataFromUrl(mixed $id, string $type, string $language): array
+    public function findPage(mixed $id, string $type, string $locale): array
     {
-        $url = $this->apiHost;
+        $url = $this->apiHost . (str_ends_with($this->apiHost, '/') ? '' : '/') . 'findpage';
 
         if (empty($url)) {
             $this->getLogger()->error('[FirstSpiritContentRequester] No API host set');
             throw new FirstSpiritPreviewContentClientException('No API host set');
         }
 
-        $query = http_build_query(
-            array(
-                'id' => $id,
-                'type' => $type,
-                'locale' => $language,
-            )
-        );
+        $data = $this->performRequest($url, array(
+            'id' => $id,
+            'type' => $type,
+            'locale' => $locale,
+        ));
+
+        return $data;
+    }
+
+
+    /**
+     * @param string $fsPageId
+     * @param string $locale
+     * @return array
+     * @throws FirstSpiritPreviewContentClientException
+     */
+    public function findElement(mixed $fsPageId, string $locale): array
+    {
+        $url = $this->apiHost . (str_ends_with($this->apiHost, '/') ? '' : '/') . 'findelement';
+
+        if (empty($url)) {
+            $this->getLogger()->error('[FirstSpiritContentRequester] No API host set');
+            throw new FirstSpiritPreviewContentClientException('No API host set');
+        }
+
+        $data = $this->performRequest($url, array(
+            'fsPageId' => $fsPageId,
+            'locale' => $locale,
+        ));
+
+        return $data;
+    }
+
+    /**
+     * Sets the referer value to use when performing requests.
+     * 
+     * @param string $referer The value to set.
+     */
+    public function setReferer(string $referer): void
+    {
+        $this->referer = $referer;
+    }
+
+    private function performRequest(string $url, mixed $params): mixed
+    {
+
+        $query = http_build_query($params);
 
         $url = $url . $this->getNextQueryParam($url) . $query;
 
@@ -76,13 +121,6 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
             $this->getLogger()->error('[FirstSpiritContentRequester] No data received: ' . $url);
         } else {
             $data = json_decode($curlData, true);
-            $items = count($data['items']);
-            // Log slot contents for debugging purposes
-            if (!(empty($data['items'][0]))) {
-                foreach ($data['items'][0]['children'] as $slot) {
-                    $this->getLogger()->info('[FirstSpiritContentRequester] Found ' . count($slot['children']) . ' sections for slot ' . $slot['name']);
-                }
-            }
         }
 
         curl_close($ch);
@@ -90,26 +128,6 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
         $this->getLogger()->info('[FirstSpiritContentRequester] Found ' . $items . ' elements');
 
         return $data;
-    }
-
-    /**
-     * Sets the referer value to use when performing requests.
-     * 
-     * @param string $referer The value to set.
-     */
-    public function setReferer(string $referer): void
-    {
-        $this->referer = $referer;
-    }
-
-    /**
-     * Sets the host of the CFC Frontend API backend.
-     * 
-     * @param string $host The value to set.
-     */
-    public function setApiHost(string $host): void
-    {
-        $this->apiHost = $host;
     }
 
     /**

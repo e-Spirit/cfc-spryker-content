@@ -73,6 +73,18 @@ new FirstSpiritPreviewContentDataTwigFunction(),
 new FirstSpiritPreviewContentAttributesTwigFunction(),
 ```
 
+**Add namespace in Yves RouterDependencyProvider**
+
+Add the following to your `src/Pyz/Yves/Router/RouterDependencyProvider.php` file
+```
+use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\FirstSpiritPreviewContentRoutePlugin;
+```
+and in the function `protected function getRouteProvider(): array {` add the following line
+```
+new FirstSpiritPreviewContentRoutePlugin(),
+```
+
+
 **Add twig variable in template(s)**
 
 Edit templates to include lines described below:
@@ -185,6 +197,16 @@ Edit templates to include lines described below:
     </div>
 {% endblock %}
 
+```
+
+**Add twig variable in Main page > page-layout-main.twig**
+
+Add the following to your `src/Pyz/Yves/ShopUi/Theme/default/templates/page-layout-main/page-layout-main.twig` file at the end of the document after the `{ firstSpiritCfcScriptUrl|raw }}` from the `cfc-spryker-config` module.
+```
+{% block footerScripts %}
+    {{ firstSpiritCfcScriptUrl|raw }}
+    {{ firstSpiritContentChangeCallbacks | raw }}
+{% endblock %}
 ```
 
 

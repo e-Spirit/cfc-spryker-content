@@ -2,6 +2,7 @@
 
 namespace Crownpeak\Yves\FirstSpiritPreviewContent;
 
+use Crownpeak\Client\FirstSpiritPreviewContent\FirstSpiritPreviewContentClient;
 use Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewService;
 use Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentDataStore;
 use Crownpeak\Client\FirstSpiritPreviewContent\FirstSpiritPreviewContentClientInterface;
@@ -21,6 +22,7 @@ class FirstSpiritPreviewContentFactory extends AbstractFactory
 
     private FirstSpiritPreviewService $previewService;
     private FirstSpiritPreviewContentDataStore $dataStore;
+    private FirstSpiritPreviewContentClient $apiClient;
 
     public function __construct()
     {
@@ -28,7 +30,7 @@ class FirstSpiritPreviewContentFactory extends AbstractFactory
         $this->dataStore = new FirstSpiritPreviewContentDataStore();
         $config = $this->getConfig();
         $apiHost = $config->getContentEndpointScript();
-        $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CONTENT_JSON_FETCHER)->setApiHost($apiHost);
+        $this->apiClient = new FirstSpiritPreviewContentClient($apiHost);
     }
 
 
@@ -46,7 +48,7 @@ class FirstSpiritPreviewContentFactory extends AbstractFactory
      */
     public function getContentJsonFetcherClient(): FirstSpiritPreviewContentClientInterface
     {
-        return $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CONTENT_JSON_FETCHER);
+        return $this->apiClient;
     }
 
     /**
@@ -56,7 +58,7 @@ class FirstSpiritPreviewContentFactory extends AbstractFactory
      */
     public function setReferer(string $referer)
     {
-        $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CONTENT_JSON_FETCHER)->setReferer($referer);
+        $this->apiClient->setReferer($referer);
     }
 
 
