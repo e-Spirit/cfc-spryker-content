@@ -41,6 +41,12 @@ $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_RENDERED_TEMPLAT
 $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_API_RESPONSE_CACHE_DURATION] = '<Cache duration for FE API responses>'; // Value in seconds, default is 5 minutes, not used in preview mode. 0 to disable
 $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_DISPLAY_BLOCK_RENDER_ERRORS] = true;
 
+// Configure template mapping for cfc-spryker-reference-components
+$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_SECTION_TEMPLATE_MAPPING] = [
+  'text_image' => 'Crownpeak:FirstSpiritReferenceComponents/fs-text-image',
+  '*' => 'Crownpeak:FirstSpiritReferenceComponents/fs-data-visualizer',
+];
+
 ```
 for local url the value can be:
 ```
