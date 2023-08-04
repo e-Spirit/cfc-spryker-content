@@ -50,4 +50,12 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
     {
         return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_DISPLAY_BLOCK_RENDER_ERRORS, false);
     }
+
+    /**
+     * @return array Returns the configured template mapping.
+     */
+    public function getTemplateMapping(): array
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_SECTION_TEMPLATE_MAPPING, []);
+    }
 }
