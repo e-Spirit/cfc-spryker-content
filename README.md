@@ -187,6 +187,23 @@ Edit templates to include lines described below:
 
 ```
 
+**Add template for section rendering**: Create the file `src/Pyz/Shared/CmsBlock/Theme/default/template/fs_content_block.twig` with the following content:
+```twig
+{% define data = {
+    fsData: fsData,
+    template: template,
+    templateModule: templateModule
+} %}
+
+{% block content %}
+    {% include molecule( data.template, data.templateModule) with{
+        data: {
+            fsBlockData: data.fsData
+        }
+    }only %}
+{% endblock %} 
+```
+
 
 ## Testing
 To test a particular branch in your Spryker installation replace _{branchname}_ in the command below:
