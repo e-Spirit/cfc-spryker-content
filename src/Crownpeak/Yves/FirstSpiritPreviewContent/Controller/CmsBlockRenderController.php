@@ -38,6 +38,7 @@ class CmsBlockRenderController extends AbstractController
 
         $fsPageId = $request->get('fsPageId');
         $sectionId = $request->get('sectionId');
+        $wrapRequired = strtolower($request->get('wrap', '')) === 'true';
         $locale = $request->get('locale');
         if (!is_string($fsPageId)) {
             $this->getLogger()->warning('[CmsBlockRenderController] Malformatted fsPageId received');
@@ -87,6 +88,11 @@ class CmsBlockRenderController extends AbstractController
             }
 
             $renderResult = $sectionRenderUtil->renderSection($sectionToRender);
+
+            if ($wrapRequired) {
+                $renderResult = $sectionRenderUtil->decorateSection($renderResult, $sectionId . '.' . $locale);
+            }
+
             return $this->jsonResponse([
                 'renderResult' => $renderResult
             ]);

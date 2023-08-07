@@ -67,6 +67,42 @@ class FirstSpiritSectionRenderUtil
     }
   }
 
+
+
+
+  /**
+   * Decorates the section by wrapping it into a container with the preview ID set when in preview.
+   *
+   * @param string $content The sections content to wrap.
+   * @param string $previewId The preview ID of the section.
+   * @return string
+   */
+  public function decorateSection(string $content, string $previewId = ''): string
+  {
+    $isPreview = $this->getFactory()->getPreviewService()->isPreview();
+    $decoratedContent = '<div';
+    if ($isPreview && !empty($previewId)) {
+      $decoratedContent .= ' data-preview-id="' . $previewId . '"';
+    }
+    return $decoratedContent . '>' . $content . '</div>';
+  }
+
+  /**
+   * Decorates a slot by wrapping it into a container with the slot name set when in preview.
+   *
+   * @param string $content The slots content to wrap.
+   * @param string $slotName The slot name.
+   * @return string
+   */
+  public function decorateSlot(string $content, string $slotName): string
+  {
+    $isPreview = $this->getFactory()->getPreviewService()->isPreview();
+    if ($isPreview) {
+      return '<div data-fcecom-slot-name="' . $slotName . '">' . $content . '</div>';
+    }
+    return $content;
+  }
+
   /**
    * Constructs an error message to display from the given error.
    */

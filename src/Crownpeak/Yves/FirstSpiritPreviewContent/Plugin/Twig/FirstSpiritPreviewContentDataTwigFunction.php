@@ -88,13 +88,13 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
             $error = $this->getFactory()->getDataStore()->getError();
             if (!is_null($error)) {
                 $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Rendering error for slot: ' . $slotName);
-                return $this->decorateSlot($this->sectionRenderUtil->getErrorMessage($error), $slotName);
+                return $this->sectionRenderUtil->decorateSlot($this->sectionRenderUtil->getErrorMessage($error), $slotName);
             }
         }
 
         if (empty($data) || count($data['items']) === 0) {
             $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] No items found');
-            return $this->decorateSlot('', $slotName);
+            return $this->sectionRenderUtil->decorateSlot('', $slotName);
         }
         $pageContent = $data['items'][0];
         $slotContent = NULL;
@@ -119,9 +119,9 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
 
         foreach ($slotContent['children'] as $section) {
             $renderedBlock = $this->sectionRenderUtil->renderSection($section);
-            $renderedContent .= $this->decorateSection($renderedBlock, $section['previewId']);
+            $renderedContent .= $this->sectionRenderUtil->decorateSection($renderedBlock, $section['previewId']);
         }
-        return $this->decorateSlot($renderedContent, $slotName);
+        return $this->sectionRenderUtil->decorateSlot($renderedContent, $slotName);
     }
 
 
@@ -135,38 +135,5 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
     {
         $richTextUtil = new FirstSpiritRichTextUtil();
         return $richTextUtil->renderRichText($content);
-    }
-
-    /**
-     * Decorates the section by wrapping it into a container with the preview ID set when in preview.
-     *
-     * @param string $content The sections content to wrap.
-     * @param string $previewId The preview ID of the section.
-     * @return string
-     */
-    public function decorateSection(string $content, string $previewId = ''): string
-    {
-        $isPreview = $this->getFactory()->getPreviewService()->isPreview();
-        $decoratedContent = '<div';
-        if ($isPreview && !empty($previewId)) {
-            $decoratedContent .= ' data-preview-id="' . $previewId . '"';
-        }
-        return $decoratedContent . '>' . $content . '</div>';
-    }
-
-    /**
-     * Decorates a slot by wrapping it into a container with the slot name set when in preview.
-     *
-     * @param string $content The slots content to wrap.
-     * @param string $slotName The slot name.
-     * @return string
-     */
-    public function decorateSlot(string $content, string $slotName): string
-    {
-        $isPreview = $this->getFactory()->getPreviewService()->isPreview();
-        if ($isPreview) {
-            return '<div data-fcecom-slot-name="' . $slotName . '">' . $content . '</div>';
-        }
-        return $content;
     }
 }
