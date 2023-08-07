@@ -73,7 +73,9 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
             // If not in cache or in preview mode, query
             try {
                 $data = $this->getFactory()->getContentJsonFetcherClient()->findPage($id, $type, $locale);
-                $this->getFactory()->getStorageClient()->setApiResponse($cacheKey, $data);
+                if ($data) {
+                    $this->getFactory()->getStorageClient()->setApiResponse($cacheKey, $data);
+                }
             } catch (\Throwable $th) {
                 $this->getLogger()->error('[FirstSpiritPreviewContentAttributesTwigFunction] Cannot get data for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
                 $this->getLogger()->error('[FirstSpiritPreviewContentAttributesTwigFunction] ' . $th->getMessage());
