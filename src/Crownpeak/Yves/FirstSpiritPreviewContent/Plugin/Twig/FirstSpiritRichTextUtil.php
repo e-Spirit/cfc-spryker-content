@@ -35,7 +35,7 @@ class FirstSpiritRichTextUtil
         case 'link':
           return $this->renderRichLink($data, $content);
         case 'list':
-          return '<ul>' . $this->renderRichText($content) . '</ul>';
+          return '<ul style="list-style: disc; margin-left: 20px;">' . $this->renderRichText($content) . '</ul>';
         case 'listitem':
           return '<li>' . $this->renderStyledText($data, $content) . '</li>';
         default:
@@ -63,7 +63,7 @@ class FirstSpiritRichTextUtil
           $style .= ' font-weight: bold;';
           break;
         case 'italic':
-          $style .= ' text-style: italic;';
+          $style .= ' font-style: italic;';
           break;
         case 'subline':
           $style .= ' font-weight: bold; font-size: 1.5em;';
