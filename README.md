@@ -74,6 +74,26 @@ use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewConte
             new FirstSpiritPreviewContentAttributesTwigFunction(),
         ];
 ```
+
+### Register router in Yves RouterDependencyProvider
+
+Add the following to your `src/Pyz/Yves/Router/RouterDependencyProvider.php` file:
+
+```php
+// ...
+use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Route\FirstSpiritPreviewContentRoutePlugin;
+
+
+// ...
+
+    protected function getRouteProvider(): array
+    {
+        return [
+            // ...
+            new FirstSpiritPreviewContentRoutePlugin()
+        ];
+```
+
 ## Extend Twig templates
 
 ### Product template
@@ -189,7 +209,6 @@ Modify the `src/Pyz/Yves/HomePage/Theme/default/views/home/home.twig` files:
 {% endblock %}
 
 ```
-
 
 ## Testing
 To test a particular branch in your Spryker installation replace _{branchname}_ in the command below:
