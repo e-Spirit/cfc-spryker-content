@@ -22,4 +22,20 @@ interface FirstSpiritSessionClientBridgeInterface
    * @return bool
    */
   public function hasFsPreviewModeKey(): bool;
+
+  /**
+   * @param string $key
+   * @return void
+   */
+  public function setReferer(string $key);
+
+  /**
+   * @return string
+   */
+  public function getReferer(): string;
+
+  /**
+   * @return bool
+   */
+  public function hasReferer(): bool;
 }

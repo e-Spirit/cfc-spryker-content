@@ -27,6 +27,15 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
         return $this->get(FirstSpiritPreviewConstants::FIRSTSPIRIT_PREVIEW_AUTHENTICATION_TOKEN, '');
     }
 
+
+    /**
+     * @return string The host of the ESpirit web interface.
+     */
+    public function getFsWebHost(): string
+    {
+        return $this->get(FirstSpiritPreviewConstants::FIRSTSPIRIT_PREVIEW_WEB_HOST, '');
+    }
+
     /**
      * @return int Retrieves configuration value of cache duration for rendered templates.
      */
