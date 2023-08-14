@@ -14,14 +14,12 @@ use Spryker\Yves\Kernel\Container;
  */
 class FirstSpiritPreviewContentDependencyProvider extends AbstractBundleDependencyProvider
 {
-    public const CONTENT_JSON_FETCHER = 'CONTENT_JSON_FETCHER';
     public const CLIENT_SESSION = 'CLIENT_SESSION';
     public const CLIENT_STORAGE = 'CLIENT_STORAGE';
 
 
     public function provideDependencies(Container $container): Container
     {
-        $container = $this->addContentJsonFetcherClient($container);
         $container = $this->addSessionClient($container);
         $container = $this->addStorageClient($container);
 
@@ -35,15 +33,6 @@ class FirstSpiritPreviewContentDependencyProvider extends AbstractBundleDependen
         $container[static::CLIENT_STORAGE] = function (Container $container) {
             return new FirstSpiritStorageClientBridge($container->getLocator()->storage()->client(), $this->getConfig());
         };
-
-        return $container;
-    }
-
-    protected function addContentJsonFetcherClient(Container $container): Container
-    {
-        $container->set(static::CONTENT_JSON_FETCHER, function (Container $container) {
-            return new FirstSpiritPreviewContentClient();
-        });
 
         return $container;
     }

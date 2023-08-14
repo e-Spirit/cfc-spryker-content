@@ -4,7 +4,6 @@ namespace Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig;
 
 use Spryker\Service\Container\ContainerInterface;
 use Spryker\Shared\Log\LoggerTrait;
-use Spryker\Shared\Twig\TwigFunctionProvider;
 use Spryker\Yves\Kernel\AbstractPlugin;
 use Spryker\Shared\TwigExtension\Dependency\Plugin\TwigPluginInterface;
 use Twig\TwigFunction;
@@ -26,7 +25,7 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
      * usage: {{ firstSpiritAttributes(id, type, template, title, locale) }}
      * @var string
      */
-    protected const FIRSTSPIRIT_CFC_CONTENT_SCRIPT_DATA = 'firstSpiritAttributes';
+    protected const FIRSTSPIRIT_CFC_ATTRIBUTES_SCRIPT_DATA = 'firstSpiritAttributes';
 
     /**
      * @api
@@ -41,7 +40,7 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
         $this->twig = $twig;
         $twig->addFunction(
             new TwigFunction(
-                static::FIRSTSPIRIT_CFC_CONTENT_SCRIPT_DATA,
+                static::FIRSTSPIRIT_CFC_ATTRIBUTES_SCRIPT_DATA,
                 [$this, 'firstSpiritAttributes']
             )
         );
@@ -73,8 +72,10 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
         } else {
             // If not in cache or in preview mode, query
             try {
-                $data = $this->getFactory()->getContentJsonFetcherClient()->fetchContentDataFromUrl($id, $type, $locale);
-                $this->getFactory()->getStorageClient()->setApiResponse($cacheKey, $data);
+                $data = $this->getFactory()->getContentJsonFetcherClient()->findPage($id, $type, $locale);
+                if ($data) {
+                    $this->getFactory()->getStorageClient()->setApiResponse($cacheKey, $data);
+                }
             } catch (\Throwable $th) {
                 $this->getLogger()->error('[FirstSpiritPreviewContentAttributesTwigFunction] Cannot get data for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
                 $this->getLogger()->error('[FirstSpiritPreviewContentAttributesTwigFunction] ' . $th->getMessage());

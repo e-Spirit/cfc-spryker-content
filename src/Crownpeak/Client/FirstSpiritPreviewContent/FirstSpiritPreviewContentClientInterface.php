@@ -11,10 +11,17 @@ interface FirstSpiritPreviewContentClientInterface
     /**
      * @param mixed $id
      * @param string $type
-     * @param string $language
+     * @param string $locale
      * @return array
      */
-    public function fetchContentDataFromUrl(mixed $id, string $type, string $language): array;
+    public function findPage(mixed $id, string $type, string $locale): array;
+
+    /**
+     * @param string $fsPageId
+     * @param string $locale
+     * @return array
+     */
+    public function findElement(string $fsPageId, string $locale): array;
 
 
     /**
@@ -23,11 +30,4 @@ interface FirstSpiritPreviewContentClientInterface
      * @param string $referer The value to set.
      */
     public function setReferer(string $referer): void;
-
-    /**
-     * Sets the host of the CFC Frontend API backend.
-     * 
-     * @param string $host The value to set.
-     */
-    public function setApiHost(string $host): void;
 }
