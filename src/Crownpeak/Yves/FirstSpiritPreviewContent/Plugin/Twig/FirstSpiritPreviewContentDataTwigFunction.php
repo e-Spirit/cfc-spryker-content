@@ -2,7 +2,6 @@
 
 namespace Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig;
 
-use Crownpeak\Yves\FirstSpiritPreviewContent\Exception\FirstSpiritPreviewContentTemplateException;
 use Spryker\Service\Container\ContainerInterface;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Yves\Kernel\AbstractPlugin;
@@ -37,6 +36,8 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
     protected const FIRSTSPIRIT_RICHT_TEXT = 'firstSpiritRichText';
 
 
+    protected FirstSpiritSectionRenderUtil $sectionRenderUtil;
+
     /**
      * @api
      *
@@ -47,6 +48,12 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
      */
     public function extend(Environment $twig, ContainerInterface $container): Environment
     {
+        $this->sectionRenderUtil = new FirstSpiritSectionRenderUtil(
+            $twig,
+            $this->getFactory(),
+            $this->getConfig()
+        );
+
         $this->twig = $twig;
         $twig->addFunction(
             new TwigFunction(
@@ -81,13 +88,13 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
             $error = $this->getFactory()->getDataStore()->getError();
             if (!is_null($error)) {
                 $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Rendering error for slot: ' . $slotName);
-                return $this->decorateSlot($this->getErrorMessage($error), $slotName);
+                return $this->sectionRenderUtil->decorateSlot($this->sectionRenderUtil->getErrorMessage($error), $slotName);
             }
         }
 
         if (empty($data) || count($data['items']) === 0) {
             $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] No items found');
-            return $this->decorateSlot('', $slotName);
+            return $this->sectionRenderUtil->decorateSlot('', $slotName);
         }
         $pageContent = $data['items'][0];
         $slotContent = NULL;
@@ -111,52 +118,10 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
         $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Found ' . count($slotContent['children']) . ' sections to render');
 
         foreach ($slotContent['children'] as $section) {
-            $cacheKey = md5(json_encode($section));
-            if ($this->getFactory()->getStorageClient()->hasRenderedTemplate($cacheKey)) {
-                $cacheResult = $this->getFactory()->getStorageClient()->getRenderedTemplate($cacheKey);
-                $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Found in cache ' . $section['previewId'] . ' (cache key=' . $cacheKey . ')');
-                $renderedContent .= $this->decorateSection($cacheResult, $section['previewId']);
-            } else {
-                $renderedBlock = '';
-                try {
-                    $fullTemplate = $this->getTemplateForSection($section);
-                    $splitTemplate = explode('/', $fullTemplate);
-                    if (count($splitTemplate) !== 2) {
-                        throw new FirstSpiritPreviewContentTemplateException('Invalid template path ' . $fullTemplate);
-                    }
-                    $templateModule = $splitTemplate[0];
-                    $template = $splitTemplate[1];
-                    $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Attempting to render section ' . $section['previewId'] . ' with template ' . $template);
-                    $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
-                        'fsData' => $section,
-                        'template' => $template,
-                        'templateModule' => $templateModule
-                    ]);
-                    $cacheResult = $this->getFactory()->getStorageClient()->setRenderedTemplate($cacheKey, $renderedBlock);
-                    $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Finished rendering section ' . $section['previewId']);
-                } catch (\Throwable $th) {
-                    $this->getLogger()->error(sprintf(
-                        '[FirstSpiritPreviewContentDataTwigFunction] Error during rendering of section %s: %s\n%s',
-                        $section['previewId'],
-                        $th->getMessage(),
-                        $th->getTraceAsString()
-                    ));
-
-
-                    if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
-                        // If errors should be displayed, re-throw so error page with details is displayed
-                        throw $th;
-                    }
-                    $isPreview = $this->getFactory()->getPreviewService()->isPreview();
-                    if ($isPreview) {
-                        // In preview, render basic information
-                        $renderedContent = $this->getErrorMessage($th);
-                    }
-                }
-                $renderedContent .= $this->decorateSection($renderedBlock, $section['previewId']);
-            }
+            $renderedBlock = $this->sectionRenderUtil->renderSection($section);
+            $renderedContent .= $this->sectionRenderUtil->decorateSection($renderedBlock, $section['previewId']);
         }
-        return $this->decorateSlot($renderedContent, $slotName);
+        return $this->sectionRenderUtil->decorateSlot($renderedContent, $slotName);
     }
 
 
@@ -170,76 +135,5 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
     {
         $richTextUtil = new FirstSpiritRichTextUtil();
         return $richTextUtil->renderRichText($content);
-    }
-
-    /**
-     * Decorates the section by wrapping it into a container with the preview ID set when in preview.
-     *
-     * @param string $content The sections content to wrap.
-     * @param string $previewId The preview ID of the section.
-     * @return string
-     */
-    public function decorateSection(string $content, string $previewId = ''): string
-    {
-        $isPreview = $this->getFactory()->getPreviewService()->isPreview();
-        $decoratedContent = '<div';
-        if ($isPreview && !empty($previewId)) {
-            $decoratedContent .= ' data-preview-id="' . $previewId . '"';
-        }
-        return $decoratedContent . '>' . $content . '</div>';
-    }
-
-    /**
-     * Decorates a slot by wrapping it into a container with the slot name set when in preview.
-     *
-     * @param string $content The slots content to wrap.
-     * @param string $slotName The slot name.
-     * @return string
-     */
-    public function decorateSlot(string $content, string $slotName): string
-    {
-        $isPreview = $this->getFactory()->getPreviewService()->isPreview();
-        if ($isPreview) {
-            return '<div data-fcecom-slot-name="' . $slotName . '">' . $content . '</div>';
-        }
-        return $content;
-    }
-
-    /**
-     * Maps the type of the given section to a template.
-     * Uses configured mapping array.
-     *
-     * @param mixed $section The section as retrieved from the API.
-     * @return string The name of the template to use for rendering.
-     */
-    private function getTemplateForSection($section): string
-    {
-        $mapping = $this->getConfig()->getTemplateMapping();
-        $sectionType = $section['sectionType'];
-        $fallbackMappingKey = '*';
-        if (array_key_exists($sectionType, $mapping)) {
-            $templateName = $mapping[$sectionType];
-            $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Using ' . $templateName . ' for ' . $sectionType);
-            return $templateName;
-        } else if (array_key_exists($fallbackMappingKey, $mapping)) {
-            $fallbackTemplateName = $mapping[$fallbackMappingKey];
-            $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Using fallback mapping for ' . $sectionType);
-            return $fallbackTemplateName;
-        } else {
-            $this->getLogger()->warning('[FirstSpiritPreviewContentDataTwigFunction] No mapping found for ' . $sectionType);
-            throw new FirstSpiritPreviewContentTemplateException('No mapping found for ' . $sectionType);
-        }
-    }
-
-    /**
-     * Constructs an error message to display from the given error.
-     */
-    private function getErrorMessage(\Throwable $th): string
-    {
-        $isPreview = $this->getFactory()->getPreviewService()->isPreview();
-        if (!$isPreview) {
-            return '';
-        }
-        return '<div style="text-align: center"><h2>Error</h2>' . $th->getMessage() . '</div>';
     }
 }
