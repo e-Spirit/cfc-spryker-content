@@ -33,7 +33,7 @@ class FirstSpiritSectionRenderUtil
     $cacheKey = md5(json_encode($section));
     if ($this->getFactory()->getStorageClient()->hasRenderedTemplate($cacheKey)) {
       $cacheResult = $this->getFactory()->getStorageClient()->getRenderedTemplate($cacheKey);
-      $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Found in cache ' . $section['previewId'] . ' (cache key=' . $cacheKey . ')');
+      $this->getLogger()->info('[FirstSpiritSectionRenderUtil] Found in cache ' . $section['previewId'] . ' (cache key=' . $cacheKey . ')');
       return $cacheResult;
     } else {
       try {
@@ -44,26 +44,27 @@ class FirstSpiritSectionRenderUtil
         }
         $templateModule = $splitTemplate[0];
         $template = $splitTemplate[1];
-        $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Attempting to render section ' . $section['previewId'] . ' with template ' . $template);
+        $this->getLogger()->info('[FirstSpiritSectionRenderUtil] Attempting to render section ' . $section['previewId'] . ' with template ' . $template);
         $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
           'fsData' => $section,
           'template' => $template,
           'templateModule' => $templateModule
         ]);
         $this->getFactory()->getStorageClient()->setRenderedTemplate($cacheKey, $renderedBlock);
-        $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Finished rendering section ' . $section['previewId']);
+        $this->getLogger()->info('[FirstSpiritSectionRenderUtil] Finished rendering section ' . $section['previewId']);
         return $renderedBlock;
       } catch (\Throwable $th) {
-        $this->getLogger()->error(sprintf(
-          '[FirstSpiritPreviewContentDataTwigFunction] Error during rendering of section %s: %s\n%s',
-          $section['previewId'],
-          $th->getMessage(),
-          $th->getTraceAsString()
-        ));
+        $this->getLogger()->error('[FirstSpiritSectionRenderUtil] Error during rendering of section ' . $section['previewId']);
+        // $this->getLogger()->error(sprintf(
+        //   '[FirstSpiritSectionRenderUtil] %s\n%s',
+        //   $th->getMessage(),
+        //   $th->getTraceAsString()
+        // ));
 
 
         if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
           // If errors should be displayed, re-throw so error page with details is displayed
+          $this->getLogger()->info('[FirstSpiritSectionRenderUtil] Throwing exception...');
           throw $th;
         }
         $isPreview = $this->getFactory()->getPreviewService()->isPreview();
@@ -71,6 +72,8 @@ class FirstSpiritSectionRenderUtil
           // In preview, render basic information
           return $this->getErrorMessage($th);
         }
+
+        return '';
       }
     }
   }
@@ -149,14 +152,14 @@ class FirstSpiritSectionRenderUtil
     $fallbackMappingKey = '*';
     if (array_key_exists($sectionType, $mapping)) {
       $templateName = $mapping[$sectionType];
-      $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Using ' . $templateName . ' for ' . $sectionType);
+      $this->getLogger()->info('[FirstSpiritSectionRenderUtil] Using ' . $templateName . ' for ' . $sectionType);
       return $templateName;
     } else if (array_key_exists($fallbackMappingKey, $mapping)) {
       $fallbackTemplateName = $mapping[$fallbackMappingKey];
-      $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Using fallback mapping for ' . $sectionType);
+      $this->getLogger()->info('[FirstSpiritSectionRenderUtil] Using fallback mapping for ' . $sectionType);
       return $fallbackTemplateName;
     } else {
-      $this->getLogger()->warning('[FirstSpiritPreviewContentDataTwigFunction] No mapping found for ' . $sectionType);
+      $this->getLogger()->warning('[FirstSpiritSectionRenderUtil] No mapping found for ' . $sectionType);
       throw new FirstSpiritPreviewContentTemplateException('No mapping found for ' . $sectionType);
     }
   }
