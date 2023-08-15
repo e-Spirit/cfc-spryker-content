@@ -35,6 +35,13 @@ $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_CONTENT_SCRIPT_U
 $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_RENDERED_TEMPLATE_CACHE_DURATION] = '<Cache duration for rendered templates>'; // Value in seconds, default is 7 days, 0 to disable
 $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_API_RESPONSE_CACHE_DURATION] = '<Cache duration for FE API responses>'; // Value in seconds, default is 5 minutes, not used in preview mode. 0 to disable
 $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_DISPLAY_BLOCK_RENDER_ERRORS] = true;
+
+// Configure template mapping for cfc-spryker-reference-components
+$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_SECTION_TEMPLATE_MAPPING] = [
+  'text_image' => 'Crownpeak:FirstSpiritReferenceComponents/fs-text-image',
+  '*' => 'Crownpeak:FirstSpiritReferenceComponents/fs-data-visualizer',
+];
+
 ```
 
 ## Registering components
@@ -209,6 +216,25 @@ Modify the `src/Pyz/Yves/HomePage/Theme/default/views/home/home.twig` files:
 {% endblock %}
 
 ```
+
+### FirstSpirit component template
+Create the file `src/Pyz/Shared/CmsBlock/Theme/default/template/fs_content_block.twig` with the following content:
+```twig
+{% define data = {
+    fsData: fsData,
+    template: template,
+    templateModule: templateModule
+} %}
+
+{% block content %}
+    {% include molecule( data.template, data.templateModule) with{
+        data: {
+            fsBlockData: data.fsData
+        }
+    }only %}
+{% endblock %} 
+```
+
 
 ## Testing
 To test a particular branch in your Spryker installation replace _{branchname}_ in the command below:
