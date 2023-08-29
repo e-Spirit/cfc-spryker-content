@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentFactory getFactory()
+ * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentConfig getConfig()
  */
 class FirstSpiritPreviewContentEventDispatcherPlugin extends AbstractPlugin implements EventDispatcherPluginInterface
 {
@@ -53,22 +54,6 @@ class FirstSpiritPreviewContentEventDispatcherPlugin extends AbstractPlugin impl
 
                 $previewService = $this->getFactory()->getPreviewService();
                 $previewService->isPreviewAuthenticationRequested($request);
-
-                $session = $event->getRequest()->getSession();
-                // If there is already a value in the session, use it as it will be the one from CC
-                if ($session->has(self::HEADER_REFERER) && is_string($request->headers->get(self::HEADER_REFERER))) {
-                    $referer = $session->get(self::HEADER_REFERER);
-                    $this->getLogger()->info("Using referer from session: " . $referer);
-                    $this->getFactory()->setReferer($referer);
-                } else {
-                    $referer = '';
-                    if (is_string($request->headers->get(self::HEADER_REFERER))) {
-                        $referer = $request->headers->get(self::HEADER_REFERER);
-                    }
-                    $session->set(self::HEADER_REFERER, $referer);
-                    $this->getLogger()->info("Using referer from request: " . $referer);
-                    $this->getFactory()->setReferer($referer);
-                }
             },
             static::EVENT_PRIORITY
         );
