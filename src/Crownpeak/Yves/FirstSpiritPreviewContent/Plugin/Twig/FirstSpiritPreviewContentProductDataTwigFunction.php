@@ -67,8 +67,18 @@ class FirstSpiritPreviewContentProductDataTwigFunction extends AbstractPlugin im
             $locale
         );
 
-        // $this->getLogger()->info('[FirstSpiritPreviewContentProductDataTwigFunction] Retrieved storage data: ' . json_encode($productStorageData));
+        $this->getLogger()->info('[FirstSpiritPreviewContentProductDataTwigFunction] Retrieved storage data: ' . json_encode($productStorageData));
 
-        return !$productStorageData ? [] : $productStorageData;
+        // return !$productStorageData ? [] : $productStorageData;
+
+        $this->getLogger()->info('[FirstSpiritPreviewContentProductDataTwigFunction] Key: ' . $productStorageData[self::ID_PRODUCT_ABSTRACT_KEY]);
+
+        $productViewTransfer = $productStorageClient
+            ->findProductAbstractViewTransfer($productStorageData[self::ID_PRODUCT_ABSTRACT_KEY], $locale, ['hdmi']);
+
+        $this->getLogger()->info('[FirstSpiritPreviewContentProductDataTwigFunction] $productViewTransfer: ' . json_encode($productViewTransfer));
+
+
+        return !$productViewTransfer ? [] : $productViewTransfer;
     }
 }
