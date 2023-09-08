@@ -89,4 +89,23 @@ class FirstSpiritPreviewContentFactory extends AbstractFactory
     {
         return $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CLIENT_STORAGE);
     }
+
+
+    /**
+     * @return FirstSpiritProductStorageClient
+     * @throws ContainerKeyNotFoundException
+     */
+    public function getProductStorageClient()
+    {
+        return $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CLIENT_PRODUCT_STORAGE);
+    }
+
+    /**
+     * @return FirstSpiritCategoryStorageClientInterface
+     * @throws ContainerKeyNotFoundException
+     */
+    public function getCategoryStorageClient()
+    {
+        return $this->getProvidedDependency(FirstSpiritPreviewContentDependencyProvider::CLIENT_CATEGORY_STORAGE);
+    }
 }
