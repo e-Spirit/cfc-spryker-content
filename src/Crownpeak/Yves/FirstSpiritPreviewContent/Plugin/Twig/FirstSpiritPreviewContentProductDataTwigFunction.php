@@ -67,18 +67,14 @@ class FirstSpiritPreviewContentProductDataTwigFunction extends AbstractPlugin im
             $locale
         );
 
-        $this->getLogger()->info('[FirstSpiritPreviewContentProductDataTwigFunction] Retrieved storage data: ' . json_encode($productStorageData));
-
-        // return !$productStorageData ? [] : $productStorageData;
-
-        $this->getLogger()->info('[FirstSpiritPreviewContentProductDataTwigFunction] Key: ' . $productStorageData[self::ID_PRODUCT_ABSTRACT_KEY]);
+        if (!$productStorageData) {
+            return null;
+        }
 
         $productViewTransfer = $productStorageClient
-            ->findProductAbstractViewTransfer($productStorageData[self::ID_PRODUCT_ABSTRACT_KEY], $locale, ['hdmi']);
+            ->findProductAbstractViewTransfer($productStorageData[self::ID_PRODUCT_ABSTRACT_KEY], $locale);
 
-        $this->getLogger()->info('[FirstSpiritPreviewContentProductDataTwigFunction] $productViewTransfer: ' . json_encode($productViewTransfer));
-
-
-        return !$productViewTransfer ? [] : $productViewTransfer;
+        // Note that the object seems to have no content when used with json_encode(), but you may access properties like price and images
+        return !$productViewTransfer ? null : $productViewTransfer;
     }
 }
