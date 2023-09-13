@@ -31,7 +31,7 @@ $config[KernelConstants::PROJECT_NAMESPACES] = [
 // ...
 
 // ----------- FirstSpirit Preview Content Configuration
-$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_CONTENT_SCRIPT_URL] = '<ADD Content Endpoint HOST (without parameters)>'; // e.g. 'http://xxx.xxx.xxx.xxx:3001/api/findPage', has to be reachable from within the Docker container
+$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_FRONTEND_API_SERVER_URL] = '<ADD Content Endpoint HOST (without parameters)>'; // e.g. 'http://xxx.xxx.xxx.xxx:3001/api/findPage', has to be reachable from within the Docker container
 $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_RENDERED_TEMPLATE_CACHE_DURATION] = '<Cache duration for rendered templates>'; // Value in seconds, default is 7 days, 0 to disable
 $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_API_RESPONSE_CACHE_DURATION] = '<Cache duration for FE API responses>'; // Value in seconds, default is 5 minutes, not used in preview mode. 0 to disable
 $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_DISPLAY_BLOCK_RENDER_ERRORS] = true;
