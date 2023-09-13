@@ -60,6 +60,6 @@ class FirstSpiritPreviewContentCategoryDataTwigFunction extends AbstractPlugin i
 
         $categoryStorageData = $categoryStorageClient->getCategoryNodeById($categoryId, $locale);
 
-        return !$categoryStorageData ? [] : $categoryStorageData;
+        return !$categoryStorageData ? null : $categoryStorageData;
     }
 }
