@@ -46,9 +46,14 @@ class FirstSpiritRichTextUtil
 
   private function renderRichLink($data, $content): string
   {
-    // TODO
-    return '<a href="#">' . $this->renderRichText($content) . '</a>';
+    // TODO: Add links to product and category pages
+    $url = '';
+    if (isset($data['data']['lt_linkUrl'])) {
+      $url = $data['data']['lt_linkUrl'];
+    }
+    return '<a href="' . $url . '">' . $this->renderRichText($content) . '</a>';
   }
+
 
   private function renderStyledText($data, $content): string
   {
