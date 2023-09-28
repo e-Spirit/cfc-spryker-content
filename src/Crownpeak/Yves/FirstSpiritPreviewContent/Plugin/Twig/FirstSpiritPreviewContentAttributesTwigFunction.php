@@ -72,7 +72,12 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
         } else {
             // If not in cache or in preview mode, query
             try {
-                $data = $this->getFactory()->getContentJsonFetcherClient()->findPage($id, $type, $locale);
+                $data = null;
+                if ($type == 'asdcontent') {
+                    $data = $this->getFactory()->getContentJsonFetcherClient()->findElement($id, $locale);
+                } else {
+                    $data = $this->getFactory()->getContentJsonFetcherClient()->findPage($id, $type, $locale);
+                }
                 if ($data) {
                     $this->getFactory()->getStorageClient()->setApiResponse($cacheKey, $data);
                 }
