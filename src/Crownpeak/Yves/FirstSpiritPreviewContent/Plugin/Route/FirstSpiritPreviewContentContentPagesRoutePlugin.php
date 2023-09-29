@@ -8,19 +8,19 @@ use Spryker\Yves\Router\Route\RouteCollection;
 
 /**
  * Route Plugin to enable content pages route.
+ * @method \Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentConfig getConfig()
  */
 class FirstSpiritPreviewContentContentPagesRoutePlugin extends AbstractRouteProviderPlugin
 {
     protected const FIRST_SPIRIT_PREVIEW_MODULE_BUNDLE = 'FirstSpiritPreviewContent';
-
     protected const FS_CONTENT_PAGE_CONTROLLER = 'ContentPage';
-    protected const CONTROLLER_INDEX_ACTION = 'index';
 
-    protected const PATH_VARIABLE = 'content';
-    protected const PATH_VALUE = 'content';
+    protected const CONTENT_PAGE_RENDER_ACTION = 'render';
+    protected const CONTENT_PAGE_RENDER_PATH_VARIABLE = 'content';
+    protected const CONTENT_PAGE_RENDER_URL_PATTERN = '[\\w\\-_\\d\\/]+';
 
-    protected const CONTENT_PAGE_URL_PATTERN = '[\\w\\-_\\d]+';
-
+    protected const CONTENT_PAGE_GET_URL_ACTION = 'getUrl';
+    protected const CONTENT_PAGE_GET_URL_PATH_VARIABLE = 'getContentPageUrl';
 
 
     /**
@@ -30,7 +30,8 @@ class FirstSpiritPreviewContentContentPagesRoutePlugin extends AbstractRouteProv
     public function addRoutes(RouteCollection $routeCollection): RouteCollection
     {
 
-        $routeCollection->add(self::PATH_VARIABLE, $this->buildCmsBlockRenderRoute());
+        $routeCollection->add($this->getConfig()->getContentPageUrlPrefix(), $this->buildContentPageRenderRoute());
+        $routeCollection->add(self::CONTENT_PAGE_GET_URL_PATH_VARIABLE, $this->buildContentPageGetUrlRoute());
 
         return $routeCollection;
     }
@@ -38,12 +39,22 @@ class FirstSpiritPreviewContentContentPagesRoutePlugin extends AbstractRouteProv
     /**
      * @return Route
      */
-    protected function buildCmsBlockRenderRoute(): Route
+    protected function buildContentPageRenderRoute(): Route
     {
-        $path = '/{' . self::PATH_VARIABLE . '}/{contentPageUrl}';
-        $route = $this->buildRoute($path, self::FIRST_SPIRIT_PREVIEW_MODULE_BUNDLE, self::FS_CONTENT_PAGE_CONTROLLER, self::CONTROLLER_INDEX_ACTION);
-        $route->setRequirement('contentPageUrl', static::CONTENT_PAGE_URL_PATTERN);
-        $route->setRequirement(self::PATH_VARIABLE, self::PATH_VALUE);
+        $path = '/' . $this->getConfig()->getContentPageUrlPrefix() . '/{contentPageUrl}';
+        $route = $this->buildRoute($path, self::FIRST_SPIRIT_PREVIEW_MODULE_BUNDLE, self::FS_CONTENT_PAGE_CONTROLLER, self::CONTENT_PAGE_RENDER_ACTION);
+        $route->setRequirement('contentPageUrl', static::CONTENT_PAGE_RENDER_URL_PATTERN);
+        $route->setMethods('GET');
+
+        return $route;
+    }
+    /**
+     * @return Route
+     */
+    protected function buildContentPageGetUrlRoute(): Route
+    {
+        $path = '/' . self::CONTENT_PAGE_GET_URL_PATH_VARIABLE;
+        $route = $this->buildRoute($path, self::FIRST_SPIRIT_PREVIEW_MODULE_BUNDLE, self::FS_CONTENT_PAGE_CONTROLLER, self::CONTENT_PAGE_GET_URL_ACTION);
         $route->setMethods('GET');
 
         return $route;

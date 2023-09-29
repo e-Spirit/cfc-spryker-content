@@ -147,7 +147,7 @@ class FirstSpiritSectionRenderUtil
    */
   private function getTemplateForSection($section): string
   {
-    $mapping = $this->getConfig()->getTemplateMapping();
+    $mapping = $this->getConfig()->getSectionTemplateMapping();
     $sectionType = $section['sectionType'];
     $fallbackMappingKey = '*';
     if (array_key_exists($sectionType, $mapping)) {

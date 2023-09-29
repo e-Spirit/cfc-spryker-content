@@ -59,7 +59,7 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
      */
     public function firstSpiritAttributes($id, $type, $template, $title, $locale): string
     {
-        $isFsDriven = $type === 'content' ? 'true' : 'false';
+        $isFsDriven = $type === 'content' && $id !== 'homepage';
         $isPreview = $this->getFactory()->getPreviewService()->isPreview();
 
         $cacheKey = md5($id . $type . $locale . ($isPreview ? 'preview' : 'release'));
@@ -116,7 +116,7 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
         return printf(
             'data-fs-preview-id="%s" data-is-fs-driven="%s" data-fs-page-id="%s" data-fs-page-type="%s" data-fs-page-template="%s" data-fs-name-%s="%s" data-fs-lang="%s"',
             $previewId,
-            $isFsDriven,
+            $isFsDriven ? 'true' : 'false',
             $id,
             $type,
             $template,
