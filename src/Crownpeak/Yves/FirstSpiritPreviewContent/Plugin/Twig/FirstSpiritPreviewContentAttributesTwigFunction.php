@@ -59,6 +59,7 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
      */
     public function firstSpiritAttributes($id, $type, $template, $title, $locale): string
     {
+        $isFsDriven = $type === 'content' ? 'true' : 'false';
         $isPreview = $this->getFactory()->getPreviewService()->isPreview();
 
         $cacheKey = md5($id . $type . $locale . ($isPreview ? 'preview' : 'release'));
@@ -73,8 +74,9 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
             // If not in cache or in preview mode, query
             try {
                 $data = null;
-                if ($type == 'asdcontent') {
-                    $data = $this->getFactory()->getContentJsonFetcherClient()->findElement($id, $locale);
+                if ($isFsDriven) {
+                    $data = ['items' => [$this->getFactory()->getContentJsonFetcherClient()->findElement($id, $locale)]];
+                    $this->getLogger()->info('[FirstSpiritPreviewContentAttributesTwigFunction] Preview ID: ' . $id . ' - Data: ' . json_encode($data));
                 } else {
                     $data = $this->getFactory()->getContentJsonFetcherClient()->findPage($id, $type, $locale);
                 }
@@ -112,8 +114,9 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
         }
 
         return printf(
-            'data-fs-preview-id="%s" data-fs-page-id="%s" data-fs-page-type="%s" data-fs-page-template="%s" data-fs-name-%s="%s" data-fs-lang="%s"',
+            'data-fs-preview-id="%s" data-is-fs-driven="%s" data-fs-page-id="%s" data-fs-page-type="%s" data-fs-page-template="%s" data-fs-name-%s="%s" data-fs-lang="%s"',
             $previewId,
+            $isFsDriven,
             $id,
             $type,
             $template,
