@@ -133,7 +133,7 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
      */
     public function firstSpiritRichText($content): string
     {
-        $richTextUtil = new FirstSpiritRichTextUtil();
+        $richTextUtil = new FirstSpiritRichTextUtil($this->getFactory(), $this->getLocale());
         return $richTextUtil->renderRichText($content);
     }
 }

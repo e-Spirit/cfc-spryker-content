@@ -2,18 +2,29 @@
 
 namespace Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig;
 
+use Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentFactory;
+
 /**
  * Utility class to render rich text elements.
  */
 class FirstSpiritRichTextUtil
 {
 
+  private FirstSpiritPreviewContentFactory $factory;
+  private string $locale;
+
+  public function __construct(FirstSpiritPreviewContentFactory $factory, string $locale)
+  {
+    $this->factory = $factory;
+    $this->locale = $locale;
+  }
+
   /**
    * Renders rich texts recursivly.
    * 
    * @param $content Contents of the fs_text element of the API response.
    */
-  public function renderRichText($content): string
+  public function renderRichText(array $content): string
   {
     if (empty($content)) return '';
     if (is_string($content)) return $content;
@@ -35,7 +46,8 @@ class FirstSpiritRichTextUtil
         case 'link':
           return $this->renderRichLink($data, $content);
         case 'list':
-          return '<ul style="list-style: disc; margin-left: 20px;">' . $this->renderRichText($content) . '</ul>';
+          return '<ul style="list-style: disc; margin-left: 20px;">'
+            . $this->renderRichText($content) . '</ul>';
         case 'listitem':
           return '<li>' . $this->renderStyledText($data, $content) . '</li>';
         default:
@@ -47,12 +59,43 @@ class FirstSpiritRichTextUtil
   private function renderRichLink($data, $content): string
   {
     // TODO: Add links to product and category pages
-    $url = '#';
+    $url = '#123';
     $target = '';
-    if (isset($data['data']['lt_linkUrl'])) {
-      // External links
-      $url = $data['data']['lt_linkUrl'];
-      $target = ' target="_blank" ';
+    if (isset($data['template'])) {
+      switch ($data['template']) {
+        case 'dom_external_link':
+          // External links
+          if (isset($data['data']['lt_linkUrl'])) {
+            $url = $data['data']['lt_linkUrl'];
+            $target = ' target="_blank" ';
+          }
+          break;
+        case 'dom_content_link':
+          // Content page links
+          break;
+        case 'dom_category_link':
+          // Category page links
+          if (isset($data['data']['lt_category']) && count($data['data']['lt_category']['value']) === 1) {
+            $categoryId = $data['data']['lt_category']['value'][0]['identifier'];
+            $categoryStorageClient = $this->factory->getCategoryStorageClient();
+            $categoryStorageData = $categoryStorageClient->getCategoryNodeById($categoryId, $this->locale);
+            if (isset($categoryStorageData['url'])) {
+              $url = $categoryStorageData['url'];
+            }
+          }
+          break;
+        case 'dom_product_link':
+          // Product page links
+          if (isset($data['data']['lt_product']) && count($data['data']['lt_product']['value']) === 1) {
+            $productId = $data['data']['lt_product']['value'][0]['identifier'];
+            $productStorageClient = $this->factory->getProductStorageClient();
+            $productStorageData = $productStorageClient->getProductInfoById($productId, $this->locale);
+            if (isset($productStorageData['url'])) {
+              $url = $productStorageData['url'];
+            }
+          }
+          break;
+      }
     }
     return '<a href="' . $url . '" ' . $target . '>' . $this->renderRichText($content) . '</a>';
   }

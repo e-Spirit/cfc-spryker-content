@@ -18,8 +18,6 @@ use Twig\Environment;
 class FirstSpiritPreviewContentProductDataTwigFunction extends AbstractPlugin implements TwigPluginInterface
 {
     use LoggerTrait;
-    protected const PRODUCT_ABSTRACT_MAPPING_TYPE = 'sku';
-    protected const ID_PRODUCT_ABSTRACT_KEY = 'id_product_abstract';
 
 
     /**
@@ -61,20 +59,6 @@ class FirstSpiritPreviewContentProductDataTwigFunction extends AbstractPlugin im
         $locale = $this->getLocale();
         $productStorageClient = $this->getFactory()->getProductStorageClient();
 
-        $productStorageData = $productStorageClient->findProductAbstractStorageDataByMapping(
-            static::PRODUCT_ABSTRACT_MAPPING_TYPE,
-            $productId,
-            $locale
-        );
-
-        if (!$productStorageData) {
-            return null;
-        }
-
-        $productViewTransfer = $productStorageClient
-            ->findProductAbstractViewTransfer($productStorageData[self::ID_PRODUCT_ABSTRACT_KEY], $locale);
-
-        // Note that the object seems to have no content when used with json_encode(), but you may access properties like price and images
-        return !$productViewTransfer ? null : $productViewTransfer;
+        return $productStorageClient->getProductInfoById($productId, $locale);
     }
 }
