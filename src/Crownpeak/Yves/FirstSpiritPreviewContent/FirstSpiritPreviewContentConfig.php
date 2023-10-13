@@ -67,4 +67,12 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
     {
         return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_SECTION_TEMPLATE_MAPPING, []);
     }
+
+    /**
+     * @return array Returns the configured format template mapping.
+     */
+    public function getDomEditorFormatters(): array
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_DOM_EDITOR_FORMATTERS, []);
+    }
 }

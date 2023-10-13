@@ -9,14 +9,29 @@ use Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentFactory;
  */
 class FirstSpiritRichTextUtil
 {
+  private array $renderUtilPerLinkTemplateMap;
+  private array $renderUtilPerFormatTemplateMap;
 
-  private FirstSpiritPreviewContentFactory $factory;
-  private string $locale;
-
-  public function __construct(FirstSpiritPreviewContentFactory $factory, string $locale)
+  public function __construct(FirstSpiritPreviewContentFactory $factory, string $locale, array $renderUtils)
   {
-    $this->factory = $factory;
-    $this->locale = $locale;
+    $this->renderUtilPerLinkTemplateMap = [];
+    $this->renderUtilPerFormatTemplateMap = [];
+
+    foreach ($renderUtils as $key => $utilClass) {
+      $util = new $utilClass($factory, $locale);
+      $supportedLinkFormats = $util->getSupportedLinkTemplates();
+      if (is_array($supportedLinkFormats)) {
+        foreach ($supportedLinkFormats as $key2 => $format) {
+          $this->renderUtilPerLinkTemplateMap[$format] = $util;
+        }
+      }
+      $supportedTemplateFormats = $util->getSupportedFormatTemplates();
+      if (is_array($supportedTemplateFormats)) {
+        foreach ($supportedTemplateFormats as $key2 => $format) {
+          $this->renderUtilPerFormatTemplateMap[$format] = $util;
+        }
+      }
+    }
   }
 
   /**
@@ -58,87 +73,42 @@ class FirstSpiritRichTextUtil
 
   private function renderRichLink($data, $content): string
   {
-    // TODO: Add links to product and category pages
-    $url = '#123';
-    $target = '';
-    if (isset($data['template'])) {
-      switch ($data['template']) {
-        case 'dom_external_link':
-          // External links
-          if (isset($data['data']['lt_linkUrl'])) {
-            $url = $data['data']['lt_linkUrl'];
-            $target = ' target="_blank" ';
-          }
-          break;
-        case 'dom_content_link':
-          // Content page links
-          break;
-        case 'dom_category_link':
-          // Category page links
-          if (isset($data['data']['lt_category']) && count($data['data']['lt_category']['value']) === 1) {
-            $categoryId = $data['data']['lt_category']['value'][0]['identifier'];
-            $categoryStorageClient = $this->factory->getCategoryStorageClient();
-            $categoryStorageData = $categoryStorageClient->getCategoryNodeById($categoryId, $this->locale);
-            if (isset($categoryStorageData['url'])) {
-              $url = $categoryStorageData['url'];
-            }
-          }
-          break;
-        case 'dom_product_link':
-          // Product page links
-          if (isset($data['data']['lt_product']) && count($data['data']['lt_product']['value']) === 1) {
-            $productId = $data['data']['lt_product']['value'][0]['identifier'];
-            $productStorageClient = $this->factory->getProductStorageClient();
-            $productStorageData = $productStorageClient->getProductInfoById($productId, $this->locale);
-            if (isset($productStorageData['url'])) {
-              $url = $productStorageData['url'];
-            }
-          }
-          break;
-      }
+
+    $linkTemplate = $data['template'];
+
+
+    if (array_key_exists($linkTemplate, $this->renderUtilPerLinkTemplateMap)) {
+      return $this->renderUtilPerLinkTemplateMap[$linkTemplate]->renderLink($data, $content, function (...$args) {
+        return $this->renderRichText(...$args);
+      });
+    } else {
+      return '[Unsupported Link Template: ' . $linkTemplate . ']';
     }
-    return '<a href="' . $url . '" ' . $target . '>' . $this->renderRichText($content) . '</a>';
   }
 
 
   private function renderStyledText($data, $content): string
   {
+
     if (is_string($content)) return '<span>' . $content . '</span>';
 
-    $style = '';
-    $element = 'span';
-
+    $formatTemplate = null;
     if (isset($data['format'])) {
-      switch ($data['format']) {
-        case 'bold':
-          $style .= ' font-weight: bold;';
-          break;
-        case 'italic':
-          $style .= ' font-style: italic;';
-          break;
-        case 'subline':
-          $style .= ' font-weight: bold; font-size: 1.5em;';
-          break;
+      $formatTemplate = $data['format'];
+    } else if (isset($data['data-fs-style'])) {
+      $formatTemplate = $data['data-fs-style'];
+    }
+
+    if (!is_null($formatTemplate)) {
+      if (array_key_exists($formatTemplate, $this->renderUtilPerFormatTemplateMap)) {
+        return $this->renderUtilPerFormatTemplateMap[$formatTemplate]->renderText($data, $content, function (...$args) {
+          return $this->renderRichText(...$args);
+        });
+      } else {
+        return '[Unsupported Format Template: ' . json_encode($content) . '-' . json_encode($data) . ']';
       }
     }
 
-    if (isset($data['data-fs-style'])) {
-      switch ($data['data-fs-style']) {
-        case 'format.h2':
-          $style .= ' font-size: 2em;';
-          $element = 'h2';
-          break;
-        case 'format.h3':
-          $style .= ' font-size: 1.5em;';
-          $element = 'h3';
-          break;
-        case 'format.subline':
-          $style .= ' font-weight: bold; font-size: 1.5em;';
-          break;
-      }
-    }
-
-
-    return '<' . $element . ' style="' . $style . '">' . $this->renderRichText($content) . '</' . $element . '>';
+    return '<span>' . $this->renderRichText($content) . '</span>';
   }
 }
