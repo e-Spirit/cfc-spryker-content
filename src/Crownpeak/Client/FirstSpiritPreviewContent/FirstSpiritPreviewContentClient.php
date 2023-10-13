@@ -73,6 +73,28 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
     }
 
     /**
+     * @param string $locale
+     * @return array
+     * @throws FirstSpiritPreviewContentClientException
+     */
+    public function fetchNavigation(string $locale): array
+    {
+        $url = $this->apiHost . (str_ends_with($this->apiHost, '/') ? '' : '/') . 'fetchNavigation';
+
+        if (empty($url)) {
+            $this->getLogger()->error('[FirstSpiritContentRequester] No API host set');
+            throw new FirstSpiritPreviewContentClientException('No API host set');
+        }
+
+        $data = $this->performRequest($url, array(
+            'initialPath' => '/',
+            'locale' => $locale,
+        ));
+
+        return $data;
+    }
+
+    /**
      * Sets the referer value to use when performing requests.
      * 
      * @param string $referer The value to set.

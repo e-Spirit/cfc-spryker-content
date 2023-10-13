@@ -61,9 +61,9 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return array Returns the configured template mapping.
+     * @return array Returns the configured section template mapping.
      */
-    public function getTemplateMapping(): array
+    public function getSectionTemplateMapping(): array
     {
         return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_SECTION_TEMPLATE_MAPPING, []);
     }
@@ -74,5 +74,21 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
     public function getDomEditorFormatters(): array
     {
         return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_DOM_EDITOR_FORMATTERS, []);
+    }
+
+    /**
+     * @return string Returns the configured content page URL prefix.
+     */
+    public function getContentPageUrlPrefix(): string
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_CONTENT_PAGE_URL_PREFIX, 'content');
+    }
+
+    /**
+     * @return array Returns the configured content page template mapping.
+     */
+    public function getContentPageTemplateMapping(): array
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_CONTENT_PAGE_TEMPLATE_MAPPING, []);
     }
 }
