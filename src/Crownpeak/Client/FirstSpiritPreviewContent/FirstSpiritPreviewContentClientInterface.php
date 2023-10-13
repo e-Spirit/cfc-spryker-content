@@ -23,6 +23,12 @@ interface FirstSpiritPreviewContentClientInterface
      */
     public function findElement(string $fsPageId, string $locale): array;
 
+    /**
+     * @param string $locale
+     * @return array
+     * @throws FirstSpiritPreviewContentClientException
+     */
+    public function fetchNavigation(string $locale): array;
 
     /**
      * Sets the referer value to use when performing requests.
