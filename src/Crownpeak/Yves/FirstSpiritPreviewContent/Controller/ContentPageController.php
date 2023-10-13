@@ -204,8 +204,8 @@ class ContentPageController extends AbstractController
      */
     protected function stripSeoRoute($url): string
     {
-        if (str_ends_with($url, 'index.json')) {
-            return str_replace('/index.json', '', $url);
+        if (preg_match('/index\-?[\w\d]?\.json$/', $url)) {
+            return preg_replace('/\/index\-?[\w\d]?\.json$/', '', $url);
         }
         $parts = explode('/', $url);
         return str_replace('.json', '', array_pop($parts));
@@ -216,7 +216,9 @@ class ContentPageController extends AbstractController
      */
     protected function matchesSeoRoute($seoRoute, $url): string
     {
-        if (strtolower('/' . $url . '/index.json') === strtolower($seoRoute)) {
+        $regex = '/\/' . preg_quote(strtolower($url), '/') . '\/index\-?[\w\d]?\.json$/';
+
+        if (preg_match($regex, strtolower($seoRoute))) {
             return true;
         }
 
