@@ -108,8 +108,12 @@ class FirstSpiritRichTextUtil
       $fullTemplate = $this->config->getDomEditorTemplateMapping()[$formatName];
     } else {
       $this->getLogger()->warning('[FirstSpiritRichTextUtil] No mapping found for ' . $formatName);
-      return 'Error during render(): ' . json_encode(['formatName' => $formatName, 'data' => $data, 'content' => $content]);
-      throw new FirstSpiritPreviewContentTemplateException('No mapping found for ' . $formatName);
+
+      if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
+        throw new FirstSpiritPreviewContentTemplateException('No mapping found for ' . $formatName);
+      } else {
+        return '';
+      }
     }
 
     try {
@@ -139,11 +143,16 @@ class FirstSpiritRichTextUtil
       // ));
 
 
-      // if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
-      // If errors should be displayed, re-throw so error page with details is displayed
-      $this->getLogger()->info('[FirstSpiritRichTextUtil] Throwing exception...');
-      throw $th;
-      // }
+      if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
+        // If errors should be displayed, re-throw so error page with details is displayed
+        $this->getLogger()->info('[FirstSpiritRichTextUtil] Throwing exception...');
+        throw $th;
+      }
     }
+  }
+
+  private function getConfig()
+  {
+    return $this->config;
   }
 }
