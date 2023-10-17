@@ -2,36 +2,25 @@
 
 namespace Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig;
 
-use Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentFactory;
+use Crownpeak\Yves\FirstSpiritPreviewContent\Exception\FirstSpiritPreviewContentTemplateException;
+use Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentConfig;
+use Spryker\Shared\Log\LoggerTrait;
+use Twig\Environment;
 
 /**
  * Utility class to render rich text elements.
  */
 class FirstSpiritRichTextUtil
 {
-  private array $renderUtilPerLinkTemplateMap;
-  private array $renderUtilPerFormatTemplateMap;
+  use LoggerTrait;
 
-  public function __construct(FirstSpiritPreviewContentFactory $factory, string $locale, array $renderUtils)
+  private Environment $twig;
+  private FirstSpiritPreviewContentConfig $config;
+
+  public function __construct(Environment $twig, FirstSpiritPreviewContentConfig $config)
   {
-    $this->renderUtilPerLinkTemplateMap = [];
-    $this->renderUtilPerFormatTemplateMap = [];
-
-    foreach ($renderUtils as $key => $utilClass) {
-      $util = new $utilClass($factory, $locale);
-      $supportedLinkFormats = $util->getSupportedLinkTemplates();
-      if (is_array($supportedLinkFormats)) {
-        foreach ($supportedLinkFormats as $key2 => $format) {
-          $this->renderUtilPerLinkTemplateMap[$format] = $util;
-        }
-      }
-      $supportedTemplateFormats = $util->getSupportedFormatTemplates();
-      if (is_array($supportedTemplateFormats)) {
-        foreach ($supportedTemplateFormats as $key2 => $format) {
-          $this->renderUtilPerFormatTemplateMap[$format] = $util;
-        }
-      }
-    }
+    $this->twig = $twig;
+    $this->config = $config;
   }
 
   /**
@@ -39,7 +28,7 @@ class FirstSpiritRichTextUtil
    * 
    * @param $content Contents of the fs_text element of the API response.
    */
-  public function renderRichText(array $content): string
+  public function renderRichText(mixed $content): string
   {
     if (empty($content)) return '';
     if (is_string($content)) return $content;
@@ -51,64 +40,110 @@ class FirstSpiritRichTextUtil
 
       switch ($type) {
         case 'block':
-          return '<div>' . $this->renderStyledText($data, $content) . '</div>';
+          return '<div>' . $this->renderWithFormat($data, $content) . '</div>';
         case 'linebreak':
           return '<br>';
         case 'paragraph':
-          return '<p>' . $this->renderStyledText($data, $content) . '</p>';
+          return '<p>' . $this->renderWithFormat($data, $content) . '</p>';
         case 'text':
-          return $this->renderStyledText($data, $content);
+          return $this->renderWithFormat($data, $content);
         case 'link':
-          return $this->renderRichLink($data, $content);
+          return $this->renderLinkWithFormat($data, $content);
         case 'list':
           return '<ul style="list-style: disc; margin-left: 20px;">'
             . $this->renderRichText($content) . '</ul>';
         case 'listitem':
-          return '<li>' . $this->renderStyledText($data, $content) . '</li>';
+          return '<li>' . $this->renderWithFormat($data, $content) . '</li>';
         default:
           return '';
       }
     }, $content));
   }
 
-  private function renderRichLink($data, $content): string
+  private function renderWithFormat($data, $content): string
   {
 
-    $linkTemplate = $data['template'];
+    $formatName = null;
 
-
-    if (array_key_exists($linkTemplate, $this->renderUtilPerLinkTemplateMap)) {
-      return $this->renderUtilPerLinkTemplateMap[$linkTemplate]->renderLink($data, $content, function (...$args) {
-        return $this->renderRichText(...$args);
-      });
-    } else {
-      return '[Unsupported Link Template: ' . $linkTemplate . ']';
+    if (isset($data['format'])) {
+      // Default formatting
+      $formatName = $data['format'];
+    } else if (isset($data['data-fs-style'])) {
+      // Custom formatting
+      $formatName = $data['data-fs-style'];
     }
+
+    if (is_null($formatName)) {
+      $this->getLogger()->debug('[FirstSpiritRichTextUtil] No template name found for ' . json_encode($content));
+      return $this->renderRichText($content);
+    }
+
+    return $this->render($formatName, $data, $content);
   }
 
 
-  private function renderStyledText($data, $content): string
+  private function renderLinkWithFormat($data, $content): string
   {
 
-    if (is_string($content)) return '<span>' . $content . '</span>';
+    $formatName = null;
 
-    $formatTemplate = null;
-    if (isset($data['format'])) {
-      $formatTemplate = $data['format'];
-    } else if (isset($data['data-fs-style'])) {
-      $formatTemplate = $data['data-fs-style'];
+    if (isset($data['template'])) {
+      $formatName = $data['template'];
     }
 
-    if (!is_null($formatTemplate)) {
-      if (array_key_exists($formatTemplate, $this->renderUtilPerFormatTemplateMap)) {
-        return $this->renderUtilPerFormatTemplateMap[$formatTemplate]->renderText($data, $content, function (...$args) {
-          return $this->renderRichText(...$args);
-        });
-      } else {
-        return '[Unsupported Format Template: ' . json_encode($content) . '-' . json_encode($data) . ']';
+    if (is_null($formatName)) {
+      $this->getLogger()->debug('[FirstSpiritRichTextUtil] No template name found for ' . json_encode($content));
+      return $this->renderRichText($content);
+    }
+
+    return $this->render($formatName, $data, $content);
+  }
+
+
+  private function render($formatName, $data, $content): string
+  {
+    $fullTemplate = '';
+
+    if (array_key_exists($formatName, $this->config->getDomEditorTemplateMapping())) {
+      $fullTemplate = $this->config->getDomEditorTemplateMapping()[$formatName];
+    } else {
+      $this->getLogger()->warning('[FirstSpiritRichTextUtil] No mapping found for ' . $formatName);
+      return 'Error during render(): ' . json_encode(['formatName' => $formatName, 'data' => $data, 'content' => $content]);
+      throw new FirstSpiritPreviewContentTemplateException('No mapping found for ' . $formatName);
+    }
+
+    try {
+      $splitTemplate = explode('/', $fullTemplate);
+      if (count($splitTemplate) !== 2) {
+        throw new FirstSpiritPreviewContentTemplateException('Invalid template path ' . $fullTemplate);
       }
-    }
+      $templateModule = $splitTemplate[0];
+      $template = $splitTemplate[1];
+      $this->getLogger()->info('[FirstSpiritRichTextUtil] Attempting to render link format ' . $formatName . ' with template ' . $template);
+      $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
+        'fsData' => [
+          'data' => $data,
+          'content' => $content
+        ],
+        'template' => $template,
+        'templateModule' => $templateModule
+      ]);
+      $this->getLogger()->info('[FirstSpiritRichTextUtil] Finished rendering link format ' . $formatName);
+      return $renderedBlock;
+    } catch (\Throwable $th) {
+      $this->getLogger()->error('[FirstSpiritRichTextUtil] Error during rendering of section ' . $formatName);
+      // $this->getLogger()->error(sprintf(
+      //   '[FirstSpiritRichTextUtil] %s\n%s',
+      //   $th->getMessage(),
+      //   $th->getTraceAsString()
+      // ));
 
-    return '<span>' . $this->renderRichText($content) . '</span>';
+
+      // if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
+      // If errors should be displayed, re-throw so error page with details is displayed
+      $this->getLogger()->info('[FirstSpiritRichTextUtil] Throwing exception...');
+      throw $th;
+      // }
+    }
   }
 }
