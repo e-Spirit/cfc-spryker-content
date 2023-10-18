@@ -158,7 +158,7 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
      * @param string $previewId Preview identifier of the section.
      * @return mixed URL of the content link.
      */
-    public function firstSpiritContentLink($pageId, $previewId): string
+    public function firstSpiritContentLink($pageId, $previewId): mixed
     {
         // Determine origin of application
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
