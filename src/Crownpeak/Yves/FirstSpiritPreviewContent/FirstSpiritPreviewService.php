@@ -66,10 +66,11 @@ class FirstSpiritPreviewService
 
     if (empty($refererFromRequest)) {
       // Initial request by entering URL in browser
-      $this->getLogger()->info('[FirstSpiritPreviewService] Initial request detected, clearing stored referer');
-      $this->factory->getSessionClient()->setReferer('');
-      $this->factory->setReferer('');
-      $refererFromSession = '';
+      // Comment in this code to force a new session state (preview or release) when a page is opened
+      // $this->getLogger()->info('[FirstSpiritPreviewService] Initial request detected, clearing stored referer');
+      // $this->factory->getSessionClient()->setReferer('');
+      // $this->factory->setReferer('');
+      // $refererFromSession = '';
     } else if (!$isRequestFromYves) {
       // Request has not been triggered by navigating in Yves, i.e. referer is IFrame parent
       $this->getLogger()->info('[FirstSpiritPreviewService] Using referer from request: ' . $refererFromRequest);
