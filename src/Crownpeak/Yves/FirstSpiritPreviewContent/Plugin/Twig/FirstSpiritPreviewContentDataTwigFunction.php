@@ -35,6 +35,13 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
      */
     protected const FIRSTSPIRIT_RICHT_TEXT = 'firstSpiritRichText';
 
+    /**
+     * This is the name of the global function that will be available in the twig templates.
+     * usage: {{ firstSpiritContentLink(pageId, previewId) }}
+     * @var string
+     */
+    protected const FIRSTSPIRIT_CONTENT_LINK = 'firstSpiritContentLink';
+
 
     protected FirstSpiritSectionRenderUtil $sectionRenderUtil;
 
@@ -66,6 +73,13 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
             new TwigFunction(
                 static::FIRSTSPIRIT_RICHT_TEXT,
                 [$this, 'firstSpiritRichText']
+            )
+        );
+
+        $twig->addFunction(
+            new TwigFunction(
+                static::FIRSTSPIRIT_CONTENT_LINK,
+                [$this, 'firstSpiritContentLink']
             )
         );
 
@@ -135,5 +149,41 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
     {
         $richTextUtil = new FirstSpiritRichTextUtil();
         return $richTextUtil->renderRichText($content);
+    }
+
+    /**
+     * Get URL of content link.
+     *
+     * @param string $pageId Page identifier of the referenced content page.
+     * @param string $previewId Preview identifier of the section.
+     * @return mixed URL of the content link.
+     */
+    public function firstSpiritContentLink($pageId, $previewId): string
+    {
+        // Determine origin of application
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'];
+        $origin = $protocol . '://' . $host;
+
+        // Extract the locale from the previewId
+        $substring = explode('.', $previewId);
+        $locale = end($substring);
+
+        // Build the request with the required parameters
+        $params = http_build_query([
+          'pageId' => $pageId,
+          'locale' => $locale,
+        ]);
+        $request = $origin . '/getContentPageUrl?' . $params;
+
+        // Initialize cURL session
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $request);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($response);
     }
 }
