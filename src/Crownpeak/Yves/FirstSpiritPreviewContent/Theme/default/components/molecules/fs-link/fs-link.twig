@@ -1,0 +1,31 @@
+
+{% block content %}
+    {% set url = '' %}
+    {% set target = '' %}
+    {% if data.fsBlockData.data.template is not empty %}
+        {% if data.fsBlockData.data.template == 'dom_external_link' %}
+            {% if data.fsBlockData.data.data.lt_linkUrl is defined %}
+                {% set url = data.fsBlockData.data.data.lt_linkUrl %}
+                {% set target = ' target="_blank"' %}
+            {% endif %}
+        {% endif %}
+        {% if data.fsBlockData.data.template == 'dom_content_link' %}
+        {% endif %}
+        {% if data.fsBlockData.data.template == 'dom_category_link' %}
+            {% if data.fsBlockData.data.data.lt_category is defined and data.fsBlockData.data.data.lt_category.value | length == 1 %}
+                {% set categoryId = data.fsBlockData.data.data.lt_category.value[0].identifier %}
+                {% set categoryData = firstSpiritCategoryData(categoryId) %}
+                {% set url = categoryData.url %}
+            {% endif %}
+        {% endif %}
+        {% if data.fsBlockData.data.template == 'dom_product_link' %}
+            {% if data.fsBlockData.data.data.lt_product is defined and data.fsBlockData.data.data.lt_product.value | length == 1 %}
+                {% set productId = data.fsBlockData.data.data.lt_product.value[0].identifier %}
+                {% set productData = firstSpiritProductData(productId) %}
+                {% set url = productData.url %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+    <a href="{{url}}" {{target}}>{{firstSpiritRichText(data.fsBlockData.content) | raw }}</a>
+{% endblock %}

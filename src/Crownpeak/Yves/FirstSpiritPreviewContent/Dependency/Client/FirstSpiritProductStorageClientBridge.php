@@ -11,6 +11,10 @@ use Spryker\Client\ProductStorage\ProductStorageClientInterface;
  */
 class FirstSpiritProductStorageClientBridge
 {
+
+  protected const PRODUCT_ABSTRACT_MAPPING_TYPE = 'sku';
+  protected const ID_PRODUCT_ABSTRACT_KEY = 'id_product_abstract';
+
   /**
    * @var ProductStorageClientInterface $productStorageClient
    */
@@ -22,6 +26,25 @@ class FirstSpiritProductStorageClientBridge
   public function __construct($productClient)
   {
     $this->productStorageClient = $productClient;
+  }
+
+  public function getProductInfoById(string $identifier, string $localeName): ?ProductViewTransfer
+  {
+    $productStorageData = $this->findProductAbstractStorageDataByMapping(
+      static::PRODUCT_ABSTRACT_MAPPING_TYPE,
+      $identifier,
+      $localeName
+    );
+
+    if (!$productStorageData) {
+      return null;
+    }
+
+    $productViewTransfer = $this
+      ->findProductAbstractViewTransfer($productStorageData[self::ID_PRODUCT_ABSTRACT_KEY], $localeName);
+
+    // Note that the object seems to have no content when used with json_encode(), but you may access properties like price and images
+    return !$productViewTransfer ? null : $productViewTransfer;
   }
 
   /**

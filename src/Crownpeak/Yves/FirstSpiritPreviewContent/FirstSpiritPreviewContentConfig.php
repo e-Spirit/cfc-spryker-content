@@ -69,6 +69,14 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
     }
 
     /**
+     * @return array Returns the configured DOM editor template mapping.
+     */
+    public function getDomEditorTemplateMapping(): array
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_DOM_EDITOR_TEMPLATE_MAPPING, []);
+    }
+
+    /**
      * @return string Returns the configured content page URL prefix.
      */
     public function getContentPageUrlPrefix(): string

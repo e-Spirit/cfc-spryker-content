@@ -2,18 +2,33 @@
 
 namespace Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig;
 
+use Crownpeak\Yves\FirstSpiritPreviewContent\Exception\FirstSpiritPreviewContentTemplateException;
+use Crownpeak\Yves\FirstSpiritPreviewContent\FirstSpiritPreviewContentConfig;
+use Spryker\Shared\Log\LoggerTrait;
+use Twig\Environment;
+
 /**
  * Utility class to render rich text elements.
  */
 class FirstSpiritRichTextUtil
 {
+  use LoggerTrait;
+
+  private Environment $twig;
+  private FirstSpiritPreviewContentConfig $config;
+
+  public function __construct(Environment $twig, FirstSpiritPreviewContentConfig $config)
+  {
+    $this->twig = $twig;
+    $this->config = $config;
+  }
 
   /**
    * Renders rich texts recursivly.
    * 
    * @param $content Contents of the fs_text element of the API response.
    */
-  public function renderRichText($content): string
+  public function renderRichText(mixed $content): string
   {
     if (empty($content)) return '';
     if (is_string($content)) return $content;
@@ -25,77 +40,119 @@ class FirstSpiritRichTextUtil
 
       switch ($type) {
         case 'block':
-          return '<div>' . $this->renderStyledText($data, $content) . '</div>';
+          return '<div>' . $this->renderWithFormat($data, $content) . '</div>';
         case 'linebreak':
           return '<br>';
         case 'paragraph':
-          return '<p>' . $this->renderStyledText($data, $content) . '</p>';
+          return '<p>' . $this->renderWithFormat($data, $content) . '</p>';
         case 'text':
-          return $this->renderStyledText($data, $content);
+          return $this->renderWithFormat($data, $content);
         case 'link':
-          return $this->renderRichLink($data, $content);
+          return $this->renderLinkWithFormat($data, $content);
         case 'list':
-          return '<ul style="list-style: disc; margin-left: 20px;">' . $this->renderRichText($content) . '</ul>';
+          return '<ul style="list-style: disc; margin-left: 20px;">'
+            . $this->renderRichText($content) . '</ul>';
         case 'listitem':
-          return '<li>' . $this->renderStyledText($data, $content) . '</li>';
+          return '<li>' . $this->renderWithFormat($data, $content) . '</li>';
         default:
           return '';
       }
     }, $content));
   }
 
-  private function renderRichLink($data, $content): string
+  private function renderWithFormat($data, $content): string
   {
-    // TODO: Add links to product and category pages
-    $url = '#';
-    $target = '';
-    if (isset($data['data']['lt_linkUrl'])) {
-      // External links
-      $url = $data['data']['lt_linkUrl'];
-      $target = ' target="_blank" ';
+
+    $formatName = null;
+
+    if (isset($data['format'])) {
+      // Default formatting
+      $formatName = $data['format'];
+    } else if (isset($data['data-fs-style'])) {
+      // Custom formatting
+      $formatName = $data['data-fs-style'];
     }
-    return '<a href="' . $url . '" ' . $target . '>' . $this->renderRichText($content) . '</a>';
+
+    if (is_null($formatName)) {
+      $this->getLogger()->debug('[FirstSpiritRichTextUtil] No template name found for ' . json_encode($content));
+      return $this->renderRichText($content);
+    }
+
+    return $this->render($formatName, $data, $content);
   }
 
 
-  private function renderStyledText($data, $content): string
+  private function renderLinkWithFormat($data, $content): string
   {
-    if (is_string($content)) return '<span>' . $content . '</span>';
 
-    $style = '';
-    $element = 'span';
+    $formatName = null;
 
-    if (isset($data['format'])) {
-      switch ($data['format']) {
-        case 'bold':
-          $style .= ' font-weight: bold;';
-          break;
-        case 'italic':
-          $style .= ' font-style: italic;';
-          break;
-        case 'subline':
-          $style .= ' font-weight: bold; font-size: 1.5em;';
-          break;
+    if (isset($data['template'])) {
+      $formatName = $data['template'];
+    }
+
+    if (is_null($formatName)) {
+      $this->getLogger()->debug('[FirstSpiritRichTextUtil] No template name found for ' . json_encode($content));
+      return $this->renderRichText($content);
+    }
+
+    return $this->render($formatName, $data, $content);
+  }
+
+
+  private function render($formatName, $data, $content): string
+  {
+    $fullTemplate = '';
+
+    if (array_key_exists($formatName, $this->config->getDomEditorTemplateMapping())) {
+      $fullTemplate = $this->config->getDomEditorTemplateMapping()[$formatName];
+    } else {
+      $this->getLogger()->warning('[FirstSpiritRichTextUtil] No mapping found for ' . $formatName);
+
+      if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
+        throw new FirstSpiritPreviewContentTemplateException('No mapping found for ' . $formatName);
+      } else {
+        return '';
       }
     }
 
-    if (isset($data['data-fs-style'])) {
-      switch ($data['data-fs-style']) {
-        case 'format.h2':
-          $style .= ' font-size: 2em;';
-          $element = 'h2';
-          break;
-        case 'format.h3':
-          $style .= ' font-size: 1.5em;';
-          $element = 'h3';
-          break;
-        case 'format.subline':
-          $style .= ' font-weight: bold; font-size: 1.5em;';
-          break;
+    try {
+      $splitTemplate = explode('/', $fullTemplate);
+      if (count($splitTemplate) !== 2) {
+        throw new FirstSpiritPreviewContentTemplateException('Invalid template path ' . $fullTemplate);
+      }
+      $templateModule = $splitTemplate[0];
+      $template = $splitTemplate[1];
+      $this->getLogger()->info('[FirstSpiritRichTextUtil] Attempting to render link format ' . $formatName . ' with template ' . $template);
+      $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
+        'fsData' => [
+          'data' => $data,
+          'content' => $content
+        ],
+        'template' => $template,
+        'templateModule' => $templateModule
+      ]);
+      $this->getLogger()->info('[FirstSpiritRichTextUtil] Finished rendering link format ' . $formatName);
+      return $renderedBlock;
+    } catch (\Throwable $th) {
+      $this->getLogger()->error('[FirstSpiritRichTextUtil] Error during rendering of section ' . $formatName);
+      // $this->getLogger()->error(sprintf(
+      //   '[FirstSpiritRichTextUtil] %s\n%s',
+      //   $th->getMessage(),
+      //   $th->getTraceAsString()
+      // ));
+
+
+      if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
+        // If errors should be displayed, re-throw so error page with details is displayed
+        $this->getLogger()->info('[FirstSpiritRichTextUtil] Throwing exception...');
+        throw $th;
       }
     }
+  }
 
-
-    return '<' . $element . ' style="' . $style . '">' . $this->renderRichText($content) . '</' . $element . '>';
+  private function getConfig()
+  {
+    return $this->config;
   }
 }
