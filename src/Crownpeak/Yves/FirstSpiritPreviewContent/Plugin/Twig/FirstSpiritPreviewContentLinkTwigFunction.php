@@ -85,9 +85,42 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
             if (isset($linkData['data']['lt_linkUrl'])) {
                 return $linkData['data']['lt_linkUrl'];
             }
+
+            $this->getLogger()->error('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . json_encode($linkData['data']));
+
             // Content pages
             if (isset($linkData['data']['lt_pageref']) && isset($linkData['data']['lt_pageref']['referenceId'])) {
-                return $linkData['data']['lt_pageref']['referenceId'];
+                // TODO: Move code from ContentPageController so we do not have to perform a request against our own server
+                $pageId = $linkData['data']['lt_pageref']['referenceId'];
+
+                $this->getLogger()->error('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . $pageId);
+
+
+                // Determine origin of application
+                $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+                $host = $_SERVER['HTTP_HOST'];
+                $origin = $protocol . '://' . $host;
+
+                // Build the request with the required parameters
+                $params = http_build_query([
+                    'pageId' => $pageId,
+                    'locale' => $this->getLocale(),
+                ]);
+                $request = $origin . '/getContentPageUrl?' . $params;
+
+                try {
+                    // Initialize cURL session
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $request);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+                    $response = curl_exec($ch);
+                    curl_close($ch);
+
+                    return json_decode($response)->url;
+                } catch (\Throwable $th) {
+                    $this->getLogger()->error('[FirstSpiritPreviewLinkTwigFunction] Failed to get URL via cURL: ' . $th->getMessage());
+                }
             }
             // Product pages
             if (isset($linkData['data']['lt_product']) && isset($linkData['data']['lt_product']['value'][0])) {
