@@ -74,32 +74,26 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
      * Resolves product and category links with Spryker data.
      * Resolves content page links with FS data.
      *
-     * @param mixed $linkData The link data as received from the API.
+     * @param mixed $link The link data as received from the API.
      * @return string The link URL.
      */
-    public function firstSpiritGetLinkUrl($linkData): string
+    public function firstSpiritGetLinkUrl($link): string
     {
+        $linkData = $this->extractLinkData($link);
 
-        if (isset($linkData['data']['lt_link']) && $linkData['data']['lt_link']['type'] == 'Link') {
-            // Nested link, e.g. CTA link
-            $linkData = $linkData['data']['lt_link'];
-        }
 
-        $this->getLogger()->debug('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . json_encode($linkData['data']));
+        $this->getLogger()->info('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . json_encode($linkData));
 
-        if (isset($linkData['data'])) {
+        if (isset($linkData)) {
             // External links
-            if (isset($linkData['data']['lt_linkUrl'])) {
-                return $linkData['data']['lt_linkUrl'];
+            if (isset($linkData['lt_linkUrl'])) {
+                return $linkData['lt_linkUrl'];
             }
 
             // Content pages
-            if (isset($linkData['data']['lt_pageref']) && isset($linkData['data']['lt_pageref']['referenceId'])) {
+            if (isset($linkData['lt_pageref']) && isset($linkData['lt_pageref']['referenceId'])) {
                 // TODO: Move code from ContentPageController so we do not have to perform a request against our own server
-                $pageId = $linkData['data']['lt_pageref']['referenceId'];
-
-                $this->getLogger()->error('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . $pageId);
-
+                $pageId = $linkData['lt_pageref']['referenceId'];
 
                 // Determine origin of application
                 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
@@ -128,15 +122,15 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
                 }
             }
             // Product pages
-            if (isset($linkData['data']['lt_product']) && isset($linkData['data']['lt_product']['value'][0])) {
-                $productId = $linkData['data']['lt_product']['value'][0]['identifier'];
+            if (isset($linkData['lt_product']) && isset($linkData['lt_product']['value'][0])) {
+                $productId = $linkData['lt_product']['value'][0]['identifier'];
                 $locale = $this->getLocale();
                 $productStorageClient = $this->getFactory()->getProductStorageClient();
                 return $productStorageClient->getProductInfoById($productId, $locale)['url'];
             }
             // Category pages
-            if (isset($linkData['data']['lt_category']) && isset($linkData['data']['lt_category']['value'][0])) {
-                $categoryId = $linkData['data']['lt_category']['value'][0]['identifier'];
+            if (isset($linkData['lt_category']) && isset($linkData['lt_category']['value'][0])) {
+                $categoryId = $linkData['lt_category']['value'][0]['identifier'];
                 $locale = $this->getLocale();
                 $categoryStorageClient = $this->getFactory()->getCategoryStorageClient();
                 return $categoryStorageClient->getCategoryNodeById($categoryId, $locale)['url'];
@@ -149,19 +143,36 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
     /**
      * Get link target.
      *
-     * @param mixed $linkData The link data as received from the API.
+     * @param mixed $link The link data as received from the API.
      * @return string
      */
-    public function firstSpiritGetLinkTarget($linkData): string
+    public function firstSpiritGetLinkTarget($link): string
     {
 
-        if (isset($linkData['data'])) {
+        $linkData = $this->extractLinkData($link);
+        if (isset($linkData)) {
             // External links
-            if (isset($linkData['data']['lt_linkUrl'])) {
+            if (isset($linkData['lt_linkUrl'])) {
                 return 'target="_blank"';
             }
         }
 
         return '';
+    }
+
+    /**
+     * Extract the deepest nested 'data' value from the given link.
+     * Necessary, because different types of links have the important data on different nesting levels.
+     * 
+     * @param mixed $link The link data to extract from.
+     * @return mixed The deepest nested 'data'.
+     */
+    private function extractLinkData(mixed $link)
+    {
+        $linkData = $link['data'];
+        while (isset($linkData['data'])) {
+            $linkData = $linkData['data'];
+        }
+        return $linkData;
     }
 }
