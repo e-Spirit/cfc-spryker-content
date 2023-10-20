@@ -80,13 +80,18 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
     public function firstSpiritGetLinkUrl($linkData): string
     {
 
+        if (isset($linkData['data']['lt_link']) && $linkData['data']['lt_link']['type'] == 'Link') {
+            // Nested link, e.g. CTA link
+            $linkData = $linkData['data']['lt_link'];
+        }
+
+        $this->getLogger()->debug('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . json_encode($linkData['data']));
+
         if (isset($linkData['data'])) {
             // External links
             if (isset($linkData['data']['lt_linkUrl'])) {
                 return $linkData['data']['lt_linkUrl'];
             }
-
-            $this->getLogger()->error('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . json_encode($linkData['data']));
 
             // Content pages
             if (isset($linkData['data']['lt_pageref']) && isset($linkData['data']['lt_pageref']['referenceId'])) {
