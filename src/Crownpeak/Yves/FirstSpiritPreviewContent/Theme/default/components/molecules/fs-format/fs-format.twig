@@ -1,0 +1,32 @@
+
+{% block content %}
+    {% set style = '' %}
+    {% set element = 'span' %}
+
+    {% if data.fsBlockData.data.format is defined %}
+        {% if data.fsBlockData.data.format == 'bold' %}
+            {% set style = style ~ ' font-weight: bold;' %}
+        {% endif %}
+        {% if data.fsBlockData.data.format == 'italic' %}
+            {% set style = style ~ ' font-style: italic;' %}
+        {% endif %}
+        {% if data.fsBlockData.data.format == 'bold' %}
+            {% set style = style ~ ' font-weight: bold; font-size: 1.5em;' %}
+        {% endif %}
+    {% endif %}
+
+    {% if data.fsBlockData.data['data-fs-style'] is defined %}
+        {% if data.fsBlockData.data['data-fs-style'] == 'format.h2' %}
+            {% set style = style ~ ' font-size: 2em;' %}
+            {% set element = 'h2' %}
+        {% endif %}
+        {% if data.fsBlockData.data['data-fs-style'] == 'format.h3' %}
+            {% set style = style ~ ' font-size: 1.5em;' %}
+            {% set element = 'h3' %}
+        {% endif %}
+        {% if data.fsBlockData.data['data-fs-style'] == 'format.subline' %}
+            {% set style = style ~ ' font-weight: bold; font-size: 1.5em;' %}
+        {% endif %}
+    {% endif %}
+    <{{element}} style="{{style}}">{{firstSpiritRichText(data.fsBlockData.content) | raw }}</{{element}}>
+{% endblock %}
