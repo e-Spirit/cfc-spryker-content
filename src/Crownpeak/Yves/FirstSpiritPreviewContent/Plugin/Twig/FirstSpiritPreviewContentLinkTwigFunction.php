@@ -79,10 +79,13 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
      */
     public function firstSpiritGetLinkUrl($link): string
     {
+
+        $this->getLogger()->info('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . json_encode($link));
+
         $linkData = $this->extractLinkData($link);
 
+        $this->getLogger()->info('[FirstSpiritPreviewLinkTwigFunction] Getting URL for extracted data' . json_encode($linkData));
 
-        $this->getLogger()->info('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . json_encode($linkData));
 
         if (isset($linkData)) {
             // External links
@@ -137,6 +140,7 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
             }
         }
 
+        $this->getLogger()->warning('[FirstSpiritPreviewLinkTwigFunction] Unable to get URL for extracted data' . json_encode($linkData));
         return '';
     }
 
@@ -169,7 +173,14 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
      */
     private function extractLinkData(mixed $link)
     {
+
         foreach ($link['data'] as $key => $value) {
+            if ($key == 'type' && $value == 'Link') {
+                // Links within DOM Editor
+                return $link['data']['data'];
+                return $this->extractLinkData($link['data']);
+            }
+
             if (isset($value['type']) && $value['type'] == 'Link') {
                 return $this->extractLinkData($value);
             }
