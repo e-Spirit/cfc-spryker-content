@@ -169,10 +169,11 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
      */
     private function extractLinkData(mixed $link)
     {
-        $linkData = $link['data'];
-        while (isset($linkData['data'])) {
-            $linkData = $linkData['data'];
+        foreach ($link['data'] as $key => $value) {
+            if (isset($value['type']) && $value['type'] == 'Link') {
+                return $this->extractLinkData($value);
+            }
         }
-        return $linkData;
+        return $link['data'];
     }
 }
