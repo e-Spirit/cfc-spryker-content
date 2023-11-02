@@ -4,6 +4,7 @@ namespace Crownpeak\Yves\FirstSpiritPreviewContent\Controller;
 
 use Crownpeak\Shared\FirstSpiritPreviewContent\FirstSpiritPreviewContentConstants;
 use Crownpeak\Yves\FirstSpiritPreviewContent\Exception\FirstSpiritPreviewContenentContentPageException;
+use Crownpeak\Shared\FirstSpiritPreviewContent\FirstSpiritContentPageUtil;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Yves\Kernel\Exception\Container\ContainerKeyNotFoundException;
 use SprykerShop\Yves\ShopApplication\Controller\AbstractController;
@@ -17,6 +18,13 @@ use Symfony\Component\HttpFoundation\Response;
 class ContentPageController extends AbstractController
 {
     use LoggerTrait;
+
+    private FirstSpiritContentPageUtil $contentPageUtil;
+
+    public function __construct()
+    {
+        $this->contentPageUtil = new FirstSpiritContentPageUtil($this->getFactory());
+    }
 
     /**
      * Renders the given content page.
@@ -37,7 +45,7 @@ class ContentPageController extends AbstractController
         $this->getLogger()->debug('[ContentPageController] Received request: ' . $contentPageUrl);
 
         try {
-            $data = $this->getFirstSpiritElementFromUrl($contentPageUrl, $locale);
+            $data = $this->contentPageUtil->getFirstSpiritElementFromUrl($contentPageUrl, $locale);
 
             if (is_null($data)) {
                 $this->getLogger()->error('[ContentPageController] Cannot get data for: ' . $contentPageUrl);
@@ -54,11 +62,11 @@ class ContentPageController extends AbstractController
                 $this->getLogger()->error('[ContentPageController] No layout set for: ' . $contentPageUrl);
                 return $this->renderError('Cannot render page.');
             }
-            $contentPageTemplate = $this->getContentPageTemplate($fsPageLayout);
+            $contentPageTemplate = $this->contentPageUtil->getContentPageTemplate($fsPageLayout);
             return $this->renderView($contentPageTemplate, [
                 'contentPageUrl' => $contentPageUrl,
                 'contentPageData' => $data,
-                'title' => $this->getPageTitle($contentPageUrl, $locale)
+                'title' => $this->contentPageUtil->getPageTitle($contentPageUrl, $locale)
             ]);
         } catch (FirstSpiritPreviewContenentContentPageException $e) {
             $this->getLogger()->error('[ContentPageController] Cannot find page: ' . $contentPageUrl);
@@ -112,119 +120,10 @@ class ContentPageController extends AbstractController
             ], 400);
         }
 
-        $data = $this->getNavigationServiceEntryByPageId($fsPageId, $locale);
-        $url = null;
-
-        if (!is_null($data['customData']) && is_string($data['customData']['pageTemplate'])) {
-            $fsPageLayout = $data['customData']['pageTemplate'];
-            $contentPageTemplate = $this->getContentPageTemplate($fsPageLayout);
-
-            if ($contentPageTemplate) {
-                // If a template mapping is defined for this FirstSpirit layout, treat it as a content page and return a URL
-                // Otherwise return no URL so frontend does not perform a redirect
-                $seoRoute = $data['seoRoute'];
-                $url = '/' . $this->getFactory()->getConfig()->getContentPageUrlPrefix() . $this->stripSeoRoute($seoRoute);
-            }
-        } else {
-            $this->getLogger()->error('[ContentPageController] No custom data or no pageTemplate set for: ' . $fsPageId);
-        }
+        $url = $this->contentPageUtil->getUrl($fsPageId, $locale);
 
         return $this->jsonResponse([
             'url' => $url
         ]);
-    }
-
-    /**
-     * Returns the mapped content page template to render based on the given FirstSpirit page layout.
-     */
-    protected function getContentPageTemplate(string $fsPageLayout): ?string
-    {
-        $contentPageTemplateMapping = $this->getFactory()->getConfig()->getContentPageTemplateMapping();
-        $contentPageTemplate = null;
-        if (array_key_exists($fsPageLayout, $contentPageTemplateMapping)) {
-            $contentPageTemplate = $contentPageTemplateMapping[$fsPageLayout];
-        } else {
-            $this->getLogger()->error('[ContentPageController] No mapping set set for layout : ' . $fsPageLayout);
-        }
-        return $contentPageTemplate;
-    }
-
-    protected function getPageTitle(string $contentPageUrl, string $locale): mixed
-    {
-        $navigationServiceEntry = $this->getNavigationServiceEntryByUrl($contentPageUrl, $locale);
-
-        return $navigationServiceEntry['label'];
-    }
-
-
-
-    protected function getNavigationServiceEntryByPageId(string $pageId, string $locale): mixed
-    {
-        $navigationData = $this->getFactory()->getContentJsonFetcherClient()->fetchNavigation($locale);
-        $idMap = $navigationData['idMap'];
-
-        if (array_key_exists($pageId, $idMap)) {
-            return $idMap[$pageId];
-        }
-
-        throw new FirstSpiritPreviewContenentContentPageException('Failed to find navigation service entry');
-    }
-
-    protected function getNavigationServiceEntryByUrl(string $contentPageUrl, string $locale): mixed
-    {
-        $navigationData = $this->getFactory()->getContentJsonFetcherClient()->fetchNavigation($locale);
-        $idMap = $navigationData['idMap'];
-
-        foreach ($idMap as $id => $pageData) {
-            if ($this->matchesSeoRoute($pageData['seoRoute'], $contentPageUrl)) {
-                return $pageData;
-            }
-        }
-
-        throw new FirstSpiritPreviewContenentContentPageException('Failed to find navigation service entry');
-    }
-
-    protected function getFirstSpiritElementFromUrl(string $contentPageUrl, string $locale): mixed
-    {
-        $navigationServiceEntry = $this->getNavigationServiceEntryByUrl($contentPageUrl, $locale);
-
-        try {
-            $data = $this->getFactory()->getContentJsonFetcherClient()->findElement($navigationServiceEntry['caasDocumentId'], $locale);
-
-            return $data;
-        } catch (\Throwable $th) {
-            $this->getLogger()->error('[ContentPageController] Cannot get element data for: ' . $contentPageUrl . '(' . $navigationServiceEntry['caasDocumentId'] . ')');
-            throw new FirstSpiritPreviewContenentContentPageException('Failed to find element data');
-        }
-    }
-
-    /**
-     * Transforms the given seoRoute as received from the Navigation Service and extracts the URL part.
-     */
-    protected function stripSeoRoute($url): string
-    {
-        if (preg_match('/index\-?[\w\d]?\.json$/', $url)) {
-            return preg_replace('/\/index\-?[\w\d]?\.json$/', '', $url);
-        }
-        $parts = explode('/', $url);
-        return str_replace('.json', '', array_pop($parts));
-    }
-
-    /**
-     * Checks if the given $url matches the given $seoRoute.
-     */
-    protected function matchesSeoRoute($seoRoute, $url): string
-    {
-        $regex = '/\/' . preg_quote(strtolower($url), '/') . '\/index\-?[\w\d]?\.json$/';
-
-        if (preg_match($regex, strtolower($seoRoute))) {
-            return true;
-        }
-
-        if (str_ends_with(strtolower($seoRoute), strtolower('/' . $url . '.json'))) {
-            return true;
-        }
-
-        return false;
     }
 }

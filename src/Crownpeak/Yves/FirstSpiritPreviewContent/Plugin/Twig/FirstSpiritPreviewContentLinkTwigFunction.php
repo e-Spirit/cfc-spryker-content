@@ -2,6 +2,7 @@
 
 namespace Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig;
 
+use Crownpeak\Shared\FirstSpiritPreviewContent\FirstSpiritContentPageUtil;
 use Spryker\Service\Container\ContainerInterface;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Yves\Kernel\AbstractPlugin;
@@ -35,6 +36,7 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
 
 
     protected FirstSpiritSectionRenderUtil $sectionRenderUtil;
+    protected FirstSpiritContentPageUtil $contentPageUtil;
 
     /**
      * @api
@@ -51,6 +53,7 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
             $this->getFactory(),
             $this->getConfig()
         );
+        $this->contentPageUtil = new FirstSpiritContentPageUtil($this->getFactory());
 
         $twig->addFunction(
             new TwigFunction(
@@ -91,33 +94,13 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
 
             // Content pages
             if (isset($linkData['lt_pageref']) && isset($linkData['lt_pageref']['referenceId'])) {
-                // TODO: Move code from ContentPageController so we do not have to perform a request against our own server
                 $pageId = $linkData['lt_pageref']['referenceId'];
+                $url = $this->contentPageUtil->getUrl($pageId, $this->getLocale());
 
-                // Determine origin of application
-                $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-                $host = $_SERVER['HTTP_HOST'];
-                $origin = $protocol . '://' . $host;
-
-                // Build the request with the required parameters
-                $params = http_build_query([
-                    'pageId' => $pageId,
-                    'locale' => $this->getLocale(),
-                ]);
-                $request = $origin . '/getContentPageUrl?' . $params;
-
-                try {
-                    // Initialize cURL session
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, $request);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-                    $response = curl_exec($ch);
-                    curl_close($ch);
-
-                    return json_decode($response)->url;
-                } catch (\Throwable $th) {
-                    $this->getLogger()->error('[FirstSpiritPreviewLinkTwigFunction] Failed to get URL via cURL: ' . $th->getMessage());
+                if (is_null($url)) {
+                    $this->getLogger()->warning('[FirstSpiritPreviewLinkTwigFunction] Cannot get URL for content page ' . $pageId);
+                } else {
+                    return $url;
                 }
             }
             // Product pages
@@ -136,7 +119,7 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
             }
         }
 
-        $this->getLogger()->warning('[FirstSpiritPreviewLinkTwigFunction] Unable to get URL for extracted data' . json_encode($linkData));
+        $this->getLogger()->warning('[FirstSpiritPreviewLinkTwigFunction] Unable to get URL for extracted data ' . json_encode($linkData));
         return '';
     }
 
