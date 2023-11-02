@@ -11,8 +11,8 @@ use Spryker\Client\Session\SessionClient;
 class FirstSpiritSessionClientBridge implements FirstSpiritSessionClientBridgeInterface
 {
 
-    private const FIRSTSPIRIT_PREVIEW_MODE = "fsPreviewMode";
-    private const FIRSTSPIRIT_REFERER = "fsReferer";
+    private const FIRSTSPIRIT_PREVIEW_MODE = 'fsPreviewMode';
+    private const FIRSTSPIRIT_REFERER = 'fsReferer';
 
     /**
      * @var SessionClient $sessionClient
@@ -45,7 +45,7 @@ class FirstSpiritSessionClientBridge implements FirstSpiritSessionClientBridgeIn
         if ($this->hasFsPreviewModeKey()) {
             return $this->sessionClient->get(self::FIRSTSPIRIT_PREVIEW_MODE);
         }
-        return "";
+        return '';
     }
 
     /**
@@ -75,7 +75,7 @@ class FirstSpiritSessionClientBridge implements FirstSpiritSessionClientBridgeIn
         if ($this->hasReferer()) {
             return $this->sessionClient->get(self::FIRSTSPIRIT_REFERER);
         }
-        return "";
+        return '';
     }
 
     /**
