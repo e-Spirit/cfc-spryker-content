@@ -79,13 +79,9 @@ class FirstSpiritPreviewContentLinkTwigFunction extends AbstractPlugin implement
      */
     public function firstSpiritGetLinkUrl($link): string
     {
-
-        $this->getLogger()->info('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . json_encode($link));
+        $this->getLogger()->debug('[FirstSpiritPreviewLinkTwigFunction] Getting URL for ' . json_encode($link));
 
         $linkData = $this->extractLinkData($link);
-
-        $this->getLogger()->info('[FirstSpiritPreviewLinkTwigFunction] Getting URL for extracted data' . json_encode($linkData));
-
 
         if (isset($linkData)) {
             // External links

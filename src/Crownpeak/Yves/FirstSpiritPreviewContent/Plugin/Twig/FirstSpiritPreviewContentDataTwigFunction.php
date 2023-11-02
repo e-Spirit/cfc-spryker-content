@@ -95,13 +95,13 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
      */
     public function firstSpiritContent($slotName): string
     {
-        $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Getting data for slot: ' . $slotName);
+        $this->getLogger()->debug('[FirstSpiritPreviewContentDataTwigFunction] Getting data for slot: ' . $slotName);
 
         $data = $this->getFactory()->getDataStore()->getCurrentPage();
         if (is_null($data)) {
             $error = $this->getFactory()->getDataStore()->getError();
             if (!is_null($error)) {
-                $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Rendering error for slot: ' . $slotName);
+                $this->getLogger()->warning('[FirstSpiritPreviewContentDataTwigFunction] Rendering error for slot: ' . $slotName);
                 return $this->sectionRenderUtil->decorateSlot($this->sectionRenderUtil->getErrorMessage($error), $slotName);
             }
         }
@@ -129,7 +129,7 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
 
         $renderedContent = '';
 
-        $this->getLogger()->info('[FirstSpiritPreviewContentDataTwigFunction] Found ' . count($slotContent['children']) . ' sections to render');
+        $this->getLogger()->debug('[FirstSpiritPreviewContentDataTwigFunction] Found ' . count($slotContent['children']) . ' sections to render');
 
         foreach ($slotContent['children'] as $section) {
             $renderedBlock = $this->sectionRenderUtil->renderSection($section);
@@ -171,8 +171,8 @@ class FirstSpiritPreviewContentDataTwigFunction extends AbstractPlugin implement
 
         // Build the request with the required parameters
         $params = http_build_query([
-          'pageId' => $pageId,
-          'locale' => $locale,
+            'pageId' => $pageId,
+            'locale' => $locale,
         ]);
         $request = $origin . '/getContentPageUrl?' . $params;
 

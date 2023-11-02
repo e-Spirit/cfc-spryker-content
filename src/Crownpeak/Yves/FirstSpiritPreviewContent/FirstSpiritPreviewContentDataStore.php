@@ -25,7 +25,7 @@ class FirstSpiritPreviewContentDataStore
       $this->getLogger()->warning('[PreviewContentDataStore] Not setting empty result');
       $this->currentPageData = null;
     } else {
-      $this->getLogger()->info('[PreviewContentDataStore] Setting data for current page ' . $data['items'][0]['previewId']);
+      $this->getLogger()->debug('[PreviewContentDataStore] Setting data for current page ' . $data['items'][0]['previewId']);
       $this->currentPageData = $data;
     }
     $this->error = null;
@@ -38,7 +38,7 @@ class FirstSpiritPreviewContentDataStore
   public function getCurrentPage()
   {
     if (!is_null($this->currentPageData)) {
-      $this->getLogger()->info('[PreviewContentDataStore] Getting data for current page ' . $this->currentPageData['items'][0]['previewId']);
+      $this->getLogger()->debug('[PreviewContentDataStore] Getting data for current page ' . $this->currentPageData['items'][0]['previewId']);
       return $this->currentPageData;
     }
     $this->getLogger()->warning('[PreviewContentDataStore] No data set for current page');

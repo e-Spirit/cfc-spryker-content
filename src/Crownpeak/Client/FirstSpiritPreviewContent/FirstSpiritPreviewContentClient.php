@@ -111,7 +111,7 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
 
         $url = $url . $this->getNextQueryParam($url) . $query;
 
-        $this->getLogger()->info('[FirstSpiritContentRequester] Content request url: ' . $url . ' with x-referrer ' . $this->referer);
+        $this->getLogger()->debug('[FirstSpiritContentRequester] Content request url: ' . $url . ' with x-referrer ' . $this->referer);
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -147,7 +147,7 @@ class FirstSpiritPreviewContentClient extends AbstractClient implements FirstSpi
 
         curl_close($ch);
 
-        $this->getLogger()->info('[FirstSpiritContentRequester] Found ' . $items . ' elements');
+        $this->getLogger()->debug('[FirstSpiritContentRequester] Found ' . $items . ' elements');
 
         return $data;
     }

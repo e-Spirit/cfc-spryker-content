@@ -34,8 +34,7 @@ class ContentPageController extends AbstractController
     {
         $contentPageUrl = $request->get('contentPageUrl');
         $locale = $request->getLocale();
-        $this->getLogger()->info('[ContentPageController] Received request: ' . $contentPageUrl);
-
+        $this->getLogger()->debug('[ContentPageController] Received request: ' . $contentPageUrl);
 
         try {
             $data = $this->getFirstSpiritElementFromUrl($contentPageUrl, $locale);

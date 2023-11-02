@@ -64,7 +64,7 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
 
         $cacheKey = md5($id . $type . $locale . ($isPreview ? 'preview' : 'release'));
 
-        $this->getLogger()->info('[FirstSpiritPreviewContentAttributesTwigFunction] Setting attributes for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
+        $this->getLogger()->debug('[FirstSpiritPreviewContentAttributesTwigFunction] Setting attributes for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
 
         $data = null;
         if (!$isPreview && $this->getFactory()->getStorageClient()->hasApiResponse($cacheKey)) {
@@ -76,7 +76,7 @@ class FirstSpiritPreviewContentAttributesTwigFunction extends AbstractPlugin imp
                 $data = null;
                 if ($isFsDriven) {
                     $data = ['items' => [$this->getFactory()->getContentJsonFetcherClient()->findElement($id, $locale)]];
-                    $this->getLogger()->info('[FirstSpiritPreviewContentAttributesTwigFunction] Preview ID: ' . $id . ' - Data: ' . json_encode($data));
+                    $this->getLogger()->debug('[FirstSpiritPreviewContentAttributesTwigFunction] Preview ID: ' . $id . ' - Data: ' . json_encode($data));
                 } else {
                     $data = $this->getFactory()->getContentJsonFetcherClient()->findPage($id, $type, $locale);
                 }

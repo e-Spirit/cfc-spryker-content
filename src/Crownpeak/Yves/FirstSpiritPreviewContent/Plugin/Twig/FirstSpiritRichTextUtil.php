@@ -123,7 +123,7 @@ class FirstSpiritRichTextUtil
       }
       $templateModule = $splitTemplate[0];
       $template = $splitTemplate[1];
-      $this->getLogger()->info('[FirstSpiritRichTextUtil] Attempting to render link format ' . $formatName . ' with template ' . $template);
+      $this->getLogger()->debug('[FirstSpiritRichTextUtil] Attempting to render link format ' . $formatName . ' with template ' . $template);
       $renderedBlock = $this->twig->render('@CmsBlock/template/fs_content_block.twig', [
         'fsData' => [
           'data' => $data,
@@ -132,20 +132,18 @@ class FirstSpiritRichTextUtil
         'template' => $template,
         'templateModule' => $templateModule
       ]);
-      $this->getLogger()->info('[FirstSpiritRichTextUtil] Finished rendering link format ' . $formatName);
       return $renderedBlock;
     } catch (\Throwable $th) {
       $this->getLogger()->error('[FirstSpiritRichTextUtil] Error during rendering of section ' . $formatName);
-      // $this->getLogger()->error(sprintf(
-      //   '[FirstSpiritRichTextUtil] %s\n%s',
-      //   $th->getMessage(),
-      //   $th->getTraceAsString()
-      // ));
+      $this->getLogger()->error(sprintf(
+        '[FirstSpiritRichTextUtil] %s\n%s',
+        $th->getMessage(),
+        $th->getTraceAsString()
+      ));
 
 
       if ($this->getConfig()->shouldDisplayBlockRenderErrors()) {
         // If errors should be displayed, re-throw so error page with details is displayed
-        $this->getLogger()->info('[FirstSpiritRichTextUtil] Throwing exception...');
         throw $th;
       }
     }
