@@ -6,12 +6,12 @@ use Spryker\Yves\Kernel\AbstractBundleConfig;
 use Crownpeak\Shared\FirstSpiritContent\FirstSpiritContentConstants;
 
 /**
- * Config for Content Data Preview.
+ * Config for the content module.
  */
 class FirstSpiritContentConfig extends AbstractBundleConfig
 {
     /**
-     * @return string Retrieves configuration value of FS Content endpoint url.
+     * @return string URL of the CFC Frontend API server / backend to be used by the Spryker server.
      */
     public function getContentEndpointScript(): string
     {
@@ -19,16 +19,15 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return string Retrieves configuration value of authentication token to init preview.
+     * @return string Authentication token that is appended to the URL via ?firstSpiritPreview=
      */
     public function getAuthenticationToken(): string
     {
         return $this->get(FirstSpiritContentConstants::FIRSTSPIRIT_PREVIEW_AUTHENTICATION_TOKEN, '');
     }
 
-
     /**
-     * @return string The host of the ESpirit web interface.
+     * @return string The Content Creator host.
      */
     public function getFsWebHost(): string
     {
@@ -36,7 +35,7 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return int Retrieves configuration value of cache duration for rendered templates.
+     * @return int Duration of the rendered template cache.
      */
     public function getRenderedTemplateCacheDuration(): int
     {
@@ -44,7 +43,7 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return int Retrieves configuration value of cache duration for API responses.
+     * @return int Duration of the CFC Frontend API server response cache.
      */
     public function getApiResponseCacheDuration(): int
     {
@@ -52,7 +51,7 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return bool Retrieves configuration value of whether to display CMS block rendering errors.
+     * @return bool Whether to display render errors in detail.
      */
     public function shouldDisplayBlockRenderErrors(): bool
     {
@@ -60,7 +59,7 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return array Returns the configured section template mapping.
+     * @return array Mapping of section templates to Twig templates.
      */
     public function getSectionTemplateMapping(): array
     {
@@ -68,7 +67,7 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return array Returns the configured DOM editor template mapping.
+     * @return array Mapping of DOM editor format templates to Twig templates.
      */
     public function getDomEditorTemplateMapping(): array
     {
@@ -76,7 +75,7 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return string Returns the configured content page URL prefix.
+     * @return string URL prefix for content pages.
      */
     public function getContentPageUrlPrefix(): string
     {
@@ -84,7 +83,7 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return array Returns the configured content page template mapping.
+     * @return array Mapping of page templates for content pages to Twig templates.
      */
     public function getContentPageTemplateMapping(): array
     {
@@ -92,7 +91,7 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return string Retrieves configuration value of rendering script url.
+     * @return string URL of the CFC Frontend API client script (static.js).
      */
     public function getRenderingScriptUrl(): string
     {
@@ -100,7 +99,7 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return string Retrieves configuration value of rendering script log level.
+     * @return string Loglevel to pass to the CFC Frontend API client.
      */
     public function getRenderingScriptLogLevel(): string
     {
@@ -108,7 +107,7 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
-     * @return string Retrieves configuration value of rendering script base url.
+     * @return string URL of the CFC Frontend API server / backend to be used by the frontend.
      */
     public function getBaseRenderingScriptUrl(): string
     {
