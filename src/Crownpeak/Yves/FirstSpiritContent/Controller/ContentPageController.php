@@ -4,9 +4,8 @@ namespace Crownpeak\Yves\FirstSpiritContent\Controller;
 
 use Crownpeak\Shared\FirstSpiritContent\ContentPageUtil;
 use Crownpeak\Shared\FirstSpiritContent\FirstSpiritContentConstants;
-use Crownpeak\Yves\FirstSpiritContent\Exception\FirstSpiritPreviewContenentContentPageException;
+use Crownpeak\Yves\FirstSpiritContent\Exception\ContentPageException;
 use Spryker\Shared\Log\LoggerTrait;
-use Spryker\Yves\Kernel\Exception\Container\ContainerKeyNotFoundException;
 use SprykerShop\Yves\ShopApplication\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -66,7 +65,7 @@ class ContentPageController extends AbstractController
                 'contentPageData' => $data,
                 'title' => $this->contentPageUtil->getPageTitle($contentPageUrl, $locale)
             ]);
-        } catch (FirstSpiritPreviewContenentContentPageException $e) {
+        } catch (ContentPageException $e) {
             $this->getLogger()->error('[ContentPageController] Cannot find page: ' . $contentPageUrl);
             $this->getLogger()->error('[ContentPageController] ' . $e->getMessage());
 
