@@ -2,7 +2,6 @@
 
 namespace Crownpeak\Yves\FirstSpiritPreviewContent;
 
-use Crownpeak\Shared\FirstSpiritPreview\FirstSpiritPreviewConstants;
 use Spryker\Yves\Kernel\AbstractBundleConfig;
 use Crownpeak\Shared\FirstSpiritPreviewContent\FirstSpiritPreviewContentConstants;
 
@@ -24,7 +23,7 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
      */
     public function getAuthenticationToken(): string
     {
-        return $this->get(FirstSpiritPreviewConstants::FIRSTSPIRIT_PREVIEW_AUTHENTICATION_TOKEN, '');
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_AUTHENTICATION_TOKEN, '');
     }
 
 
@@ -33,7 +32,7 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
      */
     public function getFsWebHost(): string
     {
-        return $this->get(FirstSpiritPreviewConstants::FIRSTSPIRIT_PREVIEW_WEB_HOST, '');
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_WEB_HOST, '');
     }
 
     /**
@@ -90,5 +89,29 @@ class FirstSpiritPreviewContentConfig extends AbstractBundleConfig
     public function getContentPageTemplateMapping(): array
     {
         return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_CONTENT_PAGE_TEMPLATE_MAPPING, []);
+    }
+
+    /**
+     * @return string Retrieves configuration value of rendering script url.
+     */
+    public function getRenderingScriptUrl(): string
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_SCRIPT_URL, '');
+    }
+
+    /**
+     * @return string Retrieves configuration value of rendering script log level.
+     */
+    public function getRenderingScriptLogLevel(): string
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_SCRIPT_LOG_LEVEL, '');
+    }
+
+    /**
+     * @return string Retrieves configuration value of rendering script base url.
+     */
+    public function getBaseRenderingScriptUrl(): string
+    {
+        return $this->get(FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_SCRIPT_BASE_URL, '');
     }
 }

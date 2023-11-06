@@ -70,6 +70,7 @@ Add the following to your `src/Pyz/Yves/Twig/TwigDependencyProvider.php` file:
 // ...
 use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewContentDataTwigFunction;
 use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewContentAttributesTwigFunction;
+use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewContentGlobalsTwigFunction;
 
 // ...
 
@@ -79,6 +80,7 @@ use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewConte
             // ...
             new FirstSpiritPreviewContentDataTwigFunction(),
             new FirstSpiritPreviewContentAttributesTwigFunction(),
+            new FirstSpiritPreviewContentGlobalsTwigPlugin(),
         ];
 ```
 
