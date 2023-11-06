@@ -2,6 +2,7 @@
 
 namespace Crownpeak\Yves\FirstSpiritContent\Plugin\Twig;
 
+use Generated\Shared\Transfer\CategoryNodeStorageTransfer;
 use Spryker\Service\Container\ContainerInterface;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Yves\Kernel\AbstractPlugin;
@@ -51,9 +52,9 @@ class CategoryDataTwigFunction extends AbstractPlugin implements TwigPluginInter
      * Return data for the given category.
      *
      * @param string $categoryId ID of the category to get data for.
-     * @return ?array The Spryker category object.
+     * @return ?CategoryNodeStorageTransfer The Spryker category object.
      */
-    public function firstSpiritCategoryData(string $categoryId): ?array
+    public function firstSpiritCategoryData(string $categoryId): ?CategoryNodeStorageTransfer
     {
         $locale = $this->getLocale();
         $categoryStorageClient = $this->getFactory()->getCategoryStorageClient();
