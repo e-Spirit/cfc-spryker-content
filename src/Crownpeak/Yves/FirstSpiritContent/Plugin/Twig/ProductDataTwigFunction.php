@@ -2,6 +2,7 @@
 
 namespace Crownpeak\Yves\FirstSpiritContent\Plugin\Twig;
 
+use Generated\Shared\Transfer\ProductViewTransfer;
 use Spryker\Service\Container\ContainerInterface;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Yves\Kernel\AbstractPlugin;
@@ -53,9 +54,9 @@ class ProductDataTwigFunction extends AbstractPlugin implements TwigPluginInterf
      * Return data for the given product.
      *
      * @param string $productId ID of the product to get data for.
-     * @return ?array The Spryker product object.
+     * @return ?ProductViewTransfer The Spryker product object.
      */
-    public function firstSpiritProductData(string $productId): ?array
+    public function firstSpiritProductData(string $productId): ?ProductViewTransfer
     {
         $locale = $this->getLocale();
         $productStorageClient = $this->getFactory()->getProductStorageClient();
