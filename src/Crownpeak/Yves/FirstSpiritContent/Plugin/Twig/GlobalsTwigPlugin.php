@@ -72,6 +72,7 @@ class GlobalsTwigPlugin extends AbstractPlugin implements TwigPluginInterface
         $script .= file_get_contents($scriptDir . '/helper.js');
         $script .= file_get_contents($scriptDir . '/hooks.js');
         $script .= file_get_contents($scriptDir . '/teaser-grid.js');
+        $script .= file_get_contents($scriptDir . '/css-variants.js');
         $script .= '</script>';
         return $script;
     }
