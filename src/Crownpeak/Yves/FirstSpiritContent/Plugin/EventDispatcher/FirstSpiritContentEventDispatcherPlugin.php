@@ -14,6 +14,10 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
+ * Event dispatcher implementation to interact with the requests and responses.
+ * Adds listener to requests check if it triggers preview mode.
+ * Adds listener to responses to add headers.
+ * 
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentFactory getFactory()
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentConfig getConfig()
  */
@@ -59,6 +63,7 @@ class FirstSpiritContentEventDispatcherPlugin extends AbstractPlugin implements 
                 }
                 $request = $event->getRequest();
 
+                // Check whether the request tiggers preview mode
                 $previewService = $this->getFactory()->getPreviewService();
                 $previewService->isPreviewAuthenticationRequested($request);
             },
@@ -88,7 +93,12 @@ class FirstSpiritContentEventDispatcherPlugin extends AbstractPlugin implements 
         return $eventDispatcher;
     }
 
-    protected function addFirstSpiritResponseHeaders(Response $response): void
+    /**
+     * Adds the CSP header to allow embedding in the Content Creator.
+     * 
+     * @param Response $response The response to add headers to.
+     */
+    private function addFirstSpiritResponseHeaders(Response $response): void
     {
         $this->getLogger()->debug('[FirstSpiritPreviewEventDispatcherPlugin] Adding frame-ancestors token');
         $fsWebHost = $this->getConfig()->getFsWebHost();
@@ -97,8 +107,10 @@ class FirstSpiritContentEventDispatcherPlugin extends AbstractPlugin implements 
 
     /**
      * Re-add cookies to request because the are blocked.
+     * 
+     * @param ResponseEvent $event The response to add headers to.
      */
-    protected function addCookies(ResponseEvent $event): void
+    private function addCookies(ResponseEvent $event): void
     {
         foreach ($event->getResponse()->headers->getCookies() as $cookie) {
             if ($cookie->isHttpOnly()) {

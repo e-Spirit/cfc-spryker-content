@@ -12,7 +12,8 @@ use Twig\Environment;
 
 
 /**
- * Twig function go set Content Url and get content data.
+ * Twig function to resolve links defined in FirstSpirit.
+ *
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentFactory getFactory()
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentConfig getConfig()
  */
@@ -127,7 +128,7 @@ class LinkTwigFunction extends AbstractPlugin implements TwigPluginInterface
      * Get link target.
      *
      * @param mixed $link The link data as received from the API.
-     * @return string
+     * @return string The target for the link.
      */
     public function firstSpiritGetLinkTarget($link): string
     {

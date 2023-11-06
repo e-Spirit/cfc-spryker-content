@@ -8,6 +8,8 @@ use Spryker\Shared\TwigExtension\Dependency\Plugin\TwigPluginInterface;
 use Twig\Environment;
 
 /**
+ * Twig function to add the script tag to include the CFC Frontend API client code (static.js).
+ * 
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentConfig getConfig()
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentFactory getFactory()
  */

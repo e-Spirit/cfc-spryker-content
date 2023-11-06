@@ -13,7 +13,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 
 /**
+ * Controller to handle the content page routes.
+ * 
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentFactory getFactory()
+ * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentConfig getConfig()
  */
 class ContentPageController extends AbstractController
 {
@@ -27,16 +30,11 @@ class ContentPageController extends AbstractController
     }
 
     /**
-     * Renders the given content page.
+     * Action to render a given content page based on the parameters passed by the request.
      * Returns HTML format.
-     *
-     * @param Request $request
-     *
-     * @return Response
-     * @throws ContainerKeyNotFoundException
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
+     * 
+     * @param Request $request The request that triggered the action.
+     * @return Response The response to pass to the client.
      */
     public function renderAction(Request $request): Response
     {
@@ -81,31 +79,12 @@ class ContentPageController extends AbstractController
         }
     }
 
-    protected function renderError(string $message, string $title = 'Error')
-    {
-        $contentPageTemplateMapping = $this->getFactory()->getConfig()->getContentPageTemplateMapping();
-
-        if (!array_key_exists(FirstSpiritContentConstants::FIRSTSPIRIT_CONTENT_PAGE_TEMPLATE_MAPPING_ERROR, $contentPageTemplateMapping)) {
-            $this->getLogger()->error('[ContentPageController] No error template defined');
-            return;
-        }
-        return $this->renderView($contentPageTemplateMapping[FirstSpiritContentConstants::FIRSTSPIRIT_CONTENT_PAGE_TEMPLATE_MAPPING_ERROR], [
-            'error' => $message,
-            'title' => $title
-        ]);
-    }
-
     /**
-     * Returns the URL based on the given FirstSpirit ID.
+     * Action to return the URL based on the given FirstSpirit ID.
      * Returns JSON format.
-     *
-     * @param Request $request
-     *
-     * @return Response
-     * @throws ContainerKeyNotFoundException
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
+     * 
+     * @param Request $request The request that triggered the action.
+     * @return Response The response to pass to the client.
      */
     public function getUrlAction(Request $request): Response
     {
@@ -124,6 +103,27 @@ class ContentPageController extends AbstractController
 
         return $this->jsonResponse([
             'url' => $url
+        ]);
+    }
+
+    /**
+     * Renders the given error.
+     * 
+     * @param string $message Message of the error.
+     * @param string $title Title of the error
+     * @return Response The response to pass to the client.
+     */
+    private function renderError(string $message, string $title = 'Error'): ?Response
+    {
+        $contentPageTemplateMapping = $this->getFactory()->getConfig()->getContentPageTemplateMapping();
+
+        if (!array_key_exists(FirstSpiritContentConstants::FIRSTSPIRIT_CONTENT_PAGE_TEMPLATE_MAPPING_ERROR, $contentPageTemplateMapping)) {
+            $this->getLogger()->error('[ContentPageController] No error template defined');
+            return null;
+        }
+        return $this->renderView($contentPageTemplateMapping[FirstSpiritContentConstants::FIRSTSPIRIT_CONTENT_PAGE_TEMPLATE_MAPPING_ERROR], [
+            'error' => $message,
+            'title' => $title
         ]);
     }
 }

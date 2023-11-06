@@ -10,7 +10,8 @@ use Spryker\Yves\Kernel\AbstractBundleDependencyProvider;
 use Spryker\Yves\Kernel\Container;
 
 /**
- * Dependency Provider.
+ * Dependency Provider for the Content module.
+ *
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentConfig getConfig()
  */
 class FirstSpiritContentDependencyProvider extends AbstractBundleDependencyProvider
@@ -46,8 +47,6 @@ class FirstSpiritContentDependencyProvider extends AbstractBundleDependencyProvi
         return $container;
     }
 
-
-
     protected function addStorageClient(Container $container): Container
     {
         $container[static::CLIENT_STORAGE] = function (Container $container) {
@@ -57,11 +56,6 @@ class FirstSpiritContentDependencyProvider extends AbstractBundleDependencyProvi
         return $container;
     }
 
-    /**
-     * @param Container $container
-     * @return Container
-     * @throws FrozenServiceException
-     */
     public function addSessionClient(Container $container): Container
     {
         $container->set(static::CLIENT_SESSION, function (Container $container) {

@@ -36,7 +36,9 @@ class CmsBlockRenderRoutePlugin extends AbstractRouteProviderPlugin
     }
 
     /**
-     * @return Route
+     * Builds the route to handle partial rendering.
+     * 
+     * @return Route The route created.
      */
     protected function buildCmsBlockRenderRoute(): Route
     {

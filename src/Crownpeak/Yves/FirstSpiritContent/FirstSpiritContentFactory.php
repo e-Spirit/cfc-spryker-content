@@ -12,7 +12,8 @@ use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Yves\Kernel\AbstractFactory;
 
 /**
- * FirstSpiritContent Factory.
+ * Factory for the Content module.
+ * 
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentConfig getConfig()
  */
 class FirstSpiritContentFactory extends AbstractFactory
@@ -41,7 +42,6 @@ class FirstSpiritContentFactory extends AbstractFactory
         return $this->previewService;
     }
 
-
     /**
      * @return FrontendApiServerClientInterface The current instance of the FrontendApiServerClient.
      */
@@ -60,8 +60,6 @@ class FirstSpiritContentFactory extends AbstractFactory
         $this->apiClient->setReferer($referer);
     }
 
-
-
     /**
      * @return SessionClientBridge
      * @throws ContainerKeyNotFoundException
@@ -71,7 +69,6 @@ class FirstSpiritContentFactory extends AbstractFactory
         return $this->getProvidedDependency(FirstSpiritContentDependencyProvider::CLIENT_SESSION);
     }
 
-
     /**
      * @return FirstSpiritContentDataStore
      */
@@ -80,7 +77,6 @@ class FirstSpiritContentFactory extends AbstractFactory
         return $this->dataStore;
     }
 
-
     /**
      * @return FirstSpiritStorageClientBridge
      */
@@ -88,7 +84,6 @@ class FirstSpiritContentFactory extends AbstractFactory
     {
         return $this->getProvidedDependency(FirstSpiritContentDependencyProvider::CLIENT_STORAGE);
     }
-
 
     /**
      * @return FirstSpiritProductStorageClient

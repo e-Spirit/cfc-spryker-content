@@ -11,7 +11,8 @@ use Twig\Environment;
 
 
 /**
- * Twig function go get information about products.
+ * Twig function to get information about products.
+ *
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentFactory getFactory()
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentConfig getConfig()
  */
@@ -52,9 +53,9 @@ class ProductDataTwigFunction extends AbstractPlugin implements TwigPluginInterf
      * Return data for the given product.
      *
      * @param string $productId ID of the product to get data for.
-     * @return mixed
+     * @return ?array The Spryker product object.
      */
-    public function firstSpiritProductData($productId): mixed
+    public function firstSpiritProductData(string $productId): ?array
     {
         $locale = $this->getLocale();
         $productStorageClient = $this->getFactory()->getProductStorageClient();

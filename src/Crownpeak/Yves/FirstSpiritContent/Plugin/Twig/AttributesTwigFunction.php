@@ -11,7 +11,9 @@ use Twig\Environment;
 
 
 /**
- * Twig function go set Content Url and get content data.
+ * Twig function to build attributes to use in the body tag in HTML.
+ * Saves the information of the current page to the DataStore so it can be used later.
+ *
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentFactory getFactory()
  */
 class AttributesTwigFunction extends AbstractPlugin implements TwigPluginInterface
@@ -23,7 +25,6 @@ class AttributesTwigFunction extends AbstractPlugin implements TwigPluginInterfa
     /**
      * This is the name of the global function that will be available in the twig templates.
      * usage: {{ firstSpiritAttributes(id, type, template, title, locale) }}
-     * @var string
      */
     protected const FIRSTSPIRIT_CFC_ATTRIBUTES_SCRIPT_DATA = 'firstSpiritAttributes';
 
@@ -50,12 +51,14 @@ class AttributesTwigFunction extends AbstractPlugin implements TwigPluginInterfa
 
     /**
      * The data that will be queried and added to the twig template(s).
-     * @param $id
-     * @param $type
-     * @param $template
-     * @param $title
-     * @param $locale
-     * @return string
+     * Returns an empty string if not in preview mode.
+     *
+     * @param $id ID of the page.
+     * @param $type Type of the page.
+     * @param $template Template of the page.
+     * @param $title Title of the page.
+     * @param $locale Locale of the page.
+     * @return string The Attributes to add to the body tag.
      */
     public function firstSpiritAttributes($id, $type, $template, $title, $locale): string
     {

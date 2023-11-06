@@ -7,14 +7,12 @@ use Spryker\Client\CategoryStorage\CategoryStorageClientInterface;
 use Spryker\Shared\Kernel\Store;
 
 /**
- * Bridge impl to category storage.
+ * Bridge implementation to category storage.
+ * Used to retrieve Spryker categories.
  */
 class CategoryStorageClientBridge
 {
-    /**
-     * @var CategoryStorageClientInterface $categoryStorageClient
-     */
-    protected $categoryStorageClient;
+    protected CategoryStorageClientInterface $categoryStorageClient;
 
     /**
      * @param CategoryStorageClientInterface $categoryStorageClient
@@ -25,12 +23,14 @@ class CategoryStorageClientBridge
     }
 
     /**
-     * @param int $categoryNodeId
-     * @param string $localeName
+     * Returns the Spryker category object.
+     * 
+     * @param int $categoryNodeId ID of the category.
+     * @param string $locale Locale to get the category object in.
      * @return CategoryNodeStorageTransfer
      */
-    public function getCategoryNodeById(int $categoryNodeId, string $localeName): CategoryNodeStorageTransfer
+    public function getCategoryNodeById(int $categoryNodeId, string $locale): CategoryNodeStorageTransfer
     {
-        return $this->categoryStorageClient->getCategoryNodeById($categoryNodeId, $localeName, Store::getInstance()->getStoreName());
+        return $this->categoryStorageClient->getCategoryNodeById($categoryNodeId, $locale, Store::getInstance()->getStoreName());
     }
 }

@@ -8,7 +8,7 @@ use Spryker\Shared\Log\LoggerTrait;
 use Crownpeak\Yves\FirstSpiritContent\Exception\FirstSpiritContentClientException;
 
 /*
- * Client to fetch data from the CFC Frontend API server / backend..
+ * Client to fetch data from the CFC Frontend API server / backend.
  */
 
 class FrontendApiServerClient extends AbstractClient implements FrontendApiServerClientInterface
@@ -24,10 +24,12 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
     }
 
     /**
-     * @param mixed $id
-     * @param string $type
-     * @param string $locale
-     * @return array
+     * Executes findPage call to the CFC Frontend API server and returns the result.
+     *
+     * @param string $id ID of the page to get.
+     * @param string $type Type of the page to get
+     * @param string $locale The locale to use for the request.
+     * @return array The result of findElement call.
      * @throws FirstSpiritContentClientException
      */
     public function findPage(mixed $id, string $type, string $locale): array
@@ -50,9 +52,11 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
 
 
     /**
-     * @param string $fsPageId
-     * @param string $locale
-     * @return array
+     * Executes findElement call to the CFC Frontend API server and returns the result.
+     * 
+     * @param string $fsPageId The ID of the FirstSpirit page.
+     * @param string $locale The locale to use for the request.
+     * @return array The result of findElement call.
      * @throws FirstSpiritContentClientException
      */
     public function findElement(mixed $fsPageId, string $locale): array
@@ -73,8 +77,10 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
     }
 
     /**
-     * @param string $locale
-     * @return array
+     * Executes fetchNavigation call to the CFC Frontend API server and returns the result.
+     * 
+     * @param string $locale The locale to use for the request.
+     * @return array The result of findElement call.
      * @throws FirstSpiritContentClientException
      */
     public function fetchNavigation(string $locale): array
@@ -104,12 +110,18 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
         $this->referer = $referer;
     }
 
-    private function performRequest(string $url, mixed $params): mixed
+    /**
+     * Performs a GET request against the given URL with the given parameters.
+     * 
+     * @param string $url The URL to execute the request against.
+     * @param array $params The parameters to append to the request.
+     */
+    private function performRequest(string $url, array $params): mixed
     {
 
         $query = http_build_query($params);
 
-        $url = $url . $this->getNextQueryParam($url) . $query;
+        $url = $url . '?' . $query;
 
         $this->getLogger()->debug('[FrontendApiServerClient] Content request url: ' . $url . ' with x-referrer ' . $this->referer);
 
@@ -150,18 +162,5 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
         $this->getLogger()->debug('[FrontendApiServerClient] Found ' . $items . ' elements');
 
         return $data;
-    }
-
-    /**
-     * @param string $url
-     * @return string
-     */
-    private function getNextQueryParam(string $url)
-    {
-        if (strpos($url, '?')) {
-            return '&';
-        } else {
-            return '?';
-        }
     }
 }

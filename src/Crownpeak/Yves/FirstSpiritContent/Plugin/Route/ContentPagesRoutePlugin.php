@@ -37,7 +37,9 @@ class ContentPagesRoutePlugin extends AbstractRouteProviderPlugin
     }
 
     /**
-     * @return Route
+     * Build the route to render content pages.
+     *
+     * @return Route The created route.
      */
     protected function buildContentPageRenderRoute(): Route
     {
@@ -49,7 +51,9 @@ class ContentPagesRoutePlugin extends AbstractRouteProviderPlugin
         return $route;
     }
     /**
-     * @return Route
+     * Build the route to retrieve content page URLs.
+     *
+     * @return Route The created route.
      */
     protected function buildContentPageGetUrlRoute(): Route
     {

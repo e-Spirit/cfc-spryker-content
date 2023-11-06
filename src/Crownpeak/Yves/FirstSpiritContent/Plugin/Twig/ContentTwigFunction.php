@@ -11,7 +11,8 @@ use Twig\Environment;
 
 
 /**
- * Twig function go set Content Url and get content data.
+ * Twig function to render FirstSpirit content.
+ *
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentFactory getFactory()
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentConfig getConfig()
  */
@@ -128,7 +129,7 @@ class ContentTwigFunction extends AbstractPlugin implements TwigPluginInterface
      * Render rich text with format.
      *
      * @param mixed $content The content as received from the API.
-     * @return string
+     * @return string The rendered rich text in HTML.
      */
     public function firstSpiritRichText($content): string
     {

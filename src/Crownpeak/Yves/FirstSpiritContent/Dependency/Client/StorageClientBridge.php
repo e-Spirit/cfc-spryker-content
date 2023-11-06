@@ -8,7 +8,8 @@ use Spryker\Client\Storage\StorageClient;
 use Spryker\Shared\Log\LoggerTrait;
 
 /**
- * Bridge to storage client.
+ * Bridge implementation to storage.
+ * Used to implement a cache.
  */
 class StorageClientBridge
 {
@@ -46,9 +47,9 @@ class StorageClientBridge
      * Gets the rendered template with the given key from the cache.
      *
      * @param string $key Key to get for.
-     * @return string
+     * @return string The rendered template from the cache.
      */
-    public function getRenderedTemplate(string $key)
+    public function getRenderedTemplate(string $key): string
     {
         return $this->storageClient->get(static::RENDERED_TEMPLATE_PREFIX . $key);
     }
@@ -57,7 +58,7 @@ class StorageClientBridge
      * Sets the rendered template with the given key in the cache.
      *
      * @param string $key Key to save for.
-     * @param string $renderedTemplate The rendered template.
+     * @param string $renderedTemplate The rendered template to save.
      */
     public function setRenderedTemplate(string $key, string $renderedTemplate)
     {
@@ -70,7 +71,7 @@ class StorageClientBridge
      * Checks if a rendered template has been saved for the given key.
      *
      * @param string $key Key to save for.
-     * @return bool
+     * @return bool Whether there is a template saved for the given key.
      */
     public function hasRenderedTemplate(string $key): bool
     {
@@ -85,9 +86,9 @@ class StorageClientBridge
      * Gets the API response with the given key from the cache.
      *
      * @param string $key Key to get for.
-     * @return mixed
+     * @return array The API response from the cache.
      */
-    public function getApiResponse(string $key)
+    public function getApiResponse(string $key): array
     {
         return $this->storageClient->get(static::API_RESPONSE_PREFIX . $key);
     }
@@ -96,7 +97,7 @@ class StorageClientBridge
      * Sets the API response with the given key in the cache.
      *
      * @param string $key Key to save for.
-     * @param mixed $response The API response.
+     * @param mixed $response The API response saved for the given key.
      */
     public function setApiResponse(string $key, mixed $response)
     {
@@ -109,7 +110,7 @@ class StorageClientBridge
      * Checks if an API response has been saved for the given key.
      *
      * @param string $key Key to save for.
-     * @return bool
+     * @return bool Whether there is a response saved for the given key.
      */
     public function hasApiResponse(string $key): bool
     {

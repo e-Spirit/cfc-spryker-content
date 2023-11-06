@@ -11,7 +11,8 @@ use Twig\Environment;
 
 
 /**
- * Twig function go get information about categories.
+ * Twig function to get information about categories.
+ *
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentFactory getFactory()
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentConfig getConfig()
  */
@@ -22,7 +23,6 @@ class CategoryDataTwigFunction extends AbstractPlugin implements TwigPluginInter
     /**
      * This is the name of the global function that will be available in the twig templates.
      * usage: {{ firstSpiritCategoryData(categoryId) }}
-     * @var string
      */
     protected const FIRSTSPIRIT_CATEGORY_DATA = 'firstSpiritCategoryData';
 
@@ -51,9 +51,9 @@ class CategoryDataTwigFunction extends AbstractPlugin implements TwigPluginInter
      * Return data for the given category.
      *
      * @param string $categoryId ID of the category to get data for.
-     * @return mixed
+     * @return ?array The Spryker category object.
      */
-    public function firstSpiritCategoryData($categoryId): mixed
+    public function firstSpiritCategoryData(string $categoryId): ?array
     {
         $locale = $this->getLocale();
         $categoryStorageClient = $this->getFactory()->getCategoryStorageClient();

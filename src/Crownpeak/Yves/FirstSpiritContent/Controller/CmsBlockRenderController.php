@@ -4,13 +4,15 @@ namespace Crownpeak\Yves\FirstSpiritContent\Controller;
 
 use Crownpeak\Yves\FirstSpiritContent\Plugin\Twig\SectionRenderUtil;
 use Spryker\Shared\Log\LoggerTrait;
-use Spryker\Yves\Kernel\Exception\Container\ContainerKeyNotFoundException;
 use SprykerShop\Yves\ShopApplication\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 
 /**
+ * Controller to handle the CMS block render route.
+ * Responds to the request with the rendered representation of the requested section.
+ * 
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentFactory getFactory()
  * @method \Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentConfig getConfig()
  */
@@ -19,13 +21,11 @@ class CmsBlockRenderController extends AbstractController
     use LoggerTrait;
 
     /**
-     * @param Request $request
-     *
-     * @return Response
-     * @throws ContainerKeyNotFoundException
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
+     * Default action to render a given section based on the parameters passed by the request.
+     * Used to partially re-render only the changed content in preview mode.
+     * 
+     * @param Request $request The request that triggered the action.
+     * @return Response The response to pass to the client.
      */
     public function indexAction(Request $request): Response
     {
