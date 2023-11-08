@@ -2,7 +2,7 @@
 
 namespace Crownpeak\Client\FirstSpiritContent;
 
-use Crownpeak\Yves\FirstSpiritContent\Exception\FirstSpiritContentClientException;
+use Crownpeak\Yves\FirstSpiritContent\Exception\ContentClientException;
 
 /*
  * Client to fetch data from the CFC Frontend API server / backend.
@@ -18,7 +18,7 @@ interface FrontendApiServerClientInterface
      * @param string $type Type of the page to get
      * @param string $locale The locale to use for the request.
      * @return array The result of findElement call.
-     * @throws FirstSpiritContentClientException
+     * @throws ContentClientException
      */
     public function findPage(string $id, string $type, string $locale): array;
 
@@ -29,7 +29,7 @@ interface FrontendApiServerClientInterface
      * @param string $fsPageId The ID of the FirstSpirit page.
      * @param string $locale The locale to use for the request.
      * @return array The result of findElement call.
-     * @throws FirstSpiritContentClientException
+     * @throws ContentClientException
      */
     public function findElement(mixed $fsPageId, string $locale): array;
     /**
@@ -37,7 +37,7 @@ interface FrontendApiServerClientInterface
      * 
      * @param string $locale The locale to use for the request.
      * @return array The result of findElement call.
-     * @throws FirstSpiritContentClientException
+     * @throws ContentClientException
      */
     public function fetchNavigation(string $locale): array;
 

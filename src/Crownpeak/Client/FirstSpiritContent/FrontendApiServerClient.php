@@ -5,7 +5,7 @@ namespace Crownpeak\Client\FirstSpiritContent;
 use Crownpeak\Client\FirstSpiritContent\FrontendApiServerClientInterface;
 use Spryker\Client\Kernel\AbstractClient;
 use Spryker\Shared\Log\LoggerTrait;
-use Crownpeak\Yves\FirstSpiritContent\Exception\FirstSpiritContentClientException;
+use Crownpeak\Yves\FirstSpiritContent\Exception\ContentClientException;
 
 /*
  * Client to fetch data from the CFC Frontend API server / backend.
@@ -30,7 +30,7 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
      * @param string $type Type of the page to get
      * @param string $locale The locale to use for the request.
      * @return array The result of findElement call.
-     * @throws FirstSpiritContentClientException
+     * @throws ContentClientException
      */
     public function findPage(mixed $id, string $type, string $locale): array
     {
@@ -38,7 +38,7 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
 
         if (empty($url)) {
             $this->getLogger()->error('[FrontendApiServerClient] No API host set');
-            throw new FirstSpiritContentClientException('No API host set');
+            throw new ContentClientException('No API host set');
         }
 
         $data = $this->performRequest($url, array(
@@ -57,7 +57,7 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
      * @param string $fsPageId The ID of the FirstSpirit page.
      * @param string $locale The locale to use for the request.
      * @return array The result of findElement call.
-     * @throws FirstSpiritContentClientException
+     * @throws ContentClientException
      */
     public function findElement(mixed $fsPageId, string $locale): array
     {
@@ -65,7 +65,7 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
 
         if (empty($url)) {
             $this->getLogger()->error('[FrontendApiServerClient] No API host set');
-            throw new FirstSpiritContentClientException('No API host set');
+            throw new ContentClientException('No API host set');
         }
 
         $data = $this->performRequest($url, array(
@@ -81,7 +81,7 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
      * 
      * @param string $locale The locale to use for the request.
      * @return array The result of findElement call.
-     * @throws FirstSpiritContentClientException
+     * @throws ContentClientException
      */
     public function fetchNavigation(string $locale): array
     {
@@ -89,7 +89,7 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
 
         if (empty($url)) {
             $this->getLogger()->error('[FrontendApiServerClient] No API host set');
-            throw new FirstSpiritContentClientException('No API host set');
+            throw new ContentClientException('No API host set');
         }
 
         $data = $this->performRequest($url, array(
@@ -141,11 +141,11 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
 
         if ($httpCode >= 400) {
             $this->getLogger()->error('[FrontendApiServerClient] Failed to fetch: ' . $url . ' (HTTP status ' . $httpCode . ')');
-            throw new FirstSpiritContentClientException('Failed to fetch (HTTP status ' . $httpCode . ')');
+            throw new ContentClientException('Failed to fetch (HTTP status ' . $httpCode . ')');
         }
         if ($curlErrNo) {
             $this->getLogger()->error('[FrontendApiServerClient] Failed to fetch: ' . $url . ' (cURL error ' . $curlErrNo . ')');
-            throw new FirstSpiritContentClientException('Failed to fetch (cURL error ' . $curlErrNo . ')');
+            throw new ContentClientException('Failed to fetch (cURL error ' . $curlErrNo . ')');
         }
 
         // Do soft logging if the url is not reachable

@@ -5,9 +5,9 @@ namespace Crownpeak\Yves\FirstSpiritContent\Exception;
 use Exception;
 
 /*
- * Exception for FirstSpiritContentClient
+ * Exception for FrontendApiServerClient
  */
 
-class ClientException extends Exception
+class ContentClientException extends Exception
 {
 }
