@@ -1,6 +1,7 @@
 FCECOM.addHook('previewInitialized', async ({ TPP_BROKER }) => {
   addCssVariantsButton(TPP_BROKER);
 });
+
 const addCssVariantsButton = (TPP_BROKER) => {
   const _variant = Symbol();
 
