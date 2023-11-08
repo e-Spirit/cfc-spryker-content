@@ -19,28 +19,70 @@ $ composer require ecom-espirit/cfc-spryker-content
 ## Configuration
 Add the following to your configuration:
 ```php
-use Crownpeak\Shared\FirstSpiritPreviewContent\FirstSpiritPreviewContentConstants;
+<?php
 
-// ...
+use Crownpeak\Shared\FirstSpiritContent\FirstSpiritContentConstants;
+use Spryker\Shared\Kernel\KernelConstants;
 
+// Allow the Twig template of our reference components to be used
 $config[KernelConstants::PROJECT_NAMESPACES] = [
- // ...
- 'Crownpeak',
+  'Pyz',
+  'EcomExtra',
+  'Crownpeak',
 ];
 
-// ...
+// Preview
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_PREVIEW_WEB_HOST] = '<FS Host>';
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_PREVIEW_AUTHENTICATION_TOKEN] = '<Token>';
 
-// ----------- FirstSpirit Preview Content Configuration
-$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_FRONTEND_API_SERVER_URL] = '<ADD Content Endpoint HOST (without parameters)>'; // e.g. 'http://xxx.xxx.xxx.xxx:3001/api/findPage', has to be reachable from within the Docker container
-$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_RENDERED_TEMPLATE_CACHE_DURATION] = '<Cache duration for rendered templates>'; // Value in seconds, default is 7 days, 0 to disable
-$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_API_RESPONSE_CACHE_DURATION] = '<Cache duration for FE API responses>'; // Value in seconds, default is 5 minutes, not used in preview mode. 0 to disable
-$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_PREVIEW_DISPLAY_BLOCK_RENDER_ERRORS] = true;
+// CFC Frontend API
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_PREVIEW_SCRIPT_URL] = '<URL>';
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_PREVIEW_SCRIPT_LOG_LEVEL] = '0';
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_FRONTEND_API_SERVER_URL] = '<URL>';
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_PREVIEW_SCRIPT_BASE_URL] = '<URL>';
 
-// Configure template mapping for cfc-spryker-reference-components
-$config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_SECTION_TEMPLATE_MAPPING] = [
+// General
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_PREVIEW_RENDERED_TEMPLATE_CACHE_DURATION] = 0;
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_PREVIEW_API_RESPONSE_CACHE_DURATION] = 0;
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_PREVIEW_DISPLAY_BLOCK_RENDER_ERRORS] = true;
+
+// Content pages
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_CONTENT_PAGE_URL_PREFIX] = 'content';
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_CONTENT_PAGE_TEMPLATE_MAPPING] = [
+  'contentpage' => '@FirstSpiritUi/views/fs-content-page/fs-content-page.twig',
+  'landingpage' => '@FirstSpiritUi/views/fs-content-page/fs-content-page.twig',
+  FirstSpiritContentConstants::FIRSTSPIRIT_CONTENT_PAGE_TEMPLATE_MAPPING_ERROR => '@FirstSpiritUi/views/fs-error/fs-error.twig'
+];
+
+
+// Component mapping
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_SECTION_TEMPLATE_MAPPING] = [
   'text_image' => 'Crownpeak:FirstSpiritReferenceComponents/fs-text-image',
+  'banner' => 'Crownpeak:FirstSpiritReferenceComponents/fs-banner',
+  'carousel' => 'Crownpeak:FirstSpiritReferenceComponents/fs-carousel',
+  'multi_slot_container' => 'Crownpeak:FirstSpiritReferenceComponents/fs-multi-slot-container',
+  'interactive_image' => 'Crownpeak:FirstSpiritReferenceComponents/fs-interactive-image',
+  'interactive_youtube_video' => 'Crownpeak:FirstSpiritReferenceComponents/fs-interactive-video',
+  'teaser_grid' => 'Crownpeak:FirstSpiritReferenceComponents/fs-teaser-grid',
   '*' => 'Crownpeak:FirstSpiritReferenceComponents/fs-data-visualizer',
 ];
+
+// Format mapping
+$config[FirstSpiritContentConstants::FIRSTSPIRIT_DOM_EDITOR_TEMPLATE_MAPPING] = [
+  // Links
+  'dom_external_link' => 'Crownpeak:FirstSpiritContent/fs-link',
+  'dom_content_link' => 'Crownpeak:FirstSpiritContent/fs-link',
+  'dom_product_link' => 'Crownpeak:FirstSpiritContent/fs-link',
+  'dom_category_link' => 'Crownpeak:FirstSpiritContent/fs-link',
+  // Formats
+  'bold' => 'Crownpeak:FirstSpiritContent/fs-format',
+  'italic' => 'Crownpeak:FirstSpiritContent/fs-format',
+  'subline' => 'Crownpeak:FirstSpiritContent/fs-format',
+  'format.h2' => 'Crownpeak:FirstSpiritContent/fs-format',
+  'format.h3' => 'Crownpeak:FirstSpiritContent/fs-format',
+  'format.subline' => 'Crownpeak:FirstSpiritContent/fs-format',
+];
+
 
 ```
 
@@ -49,7 +91,7 @@ $config[FirstSpiritPreviewContentConstants::FIRSTSPIRIT_SECTION_TEMPLATE_MAPPING
 
 Add the following to your `src/Pyz/Yves/EventDispatcher/EventDispatcherDependencyProvider.php` file:
 ```php
-use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\EventDispatcher\FirstSpiritPreviewContentEventDispatcherPlugin;
+use Crownpeak\Yves\FirstSpiritContent\Plugin\EventDispatcher\FirstSpiritContentEventDispatcherPlugin;
 
 // ...
 
@@ -57,7 +99,7 @@ use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\EventDispatcher\FirstSpiritP
     {
         return [
             // ...
-            new FirstSpiritPreviewContentEventDispatcherPlugin()
+            new FirstSpiritContentEventDispatcherPlugin()
         ];
     }
 ```
@@ -68,8 +110,13 @@ Add the following to your `src/Pyz/Yves/Twig/TwigDependencyProvider.php` file:
 
 ```php
 // ...
-use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewContentDataTwigFunction;
-use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewContentAttributesTwigFunction;
+use Crownpeak\Yves\FirstSpiritContent\Plugin\Twig\GlobalsTwigPlugin;
+use Crownpeak\Yves\FirstSpiritContent\Plugin\Twig\AttributesTwigFunction;
+use Crownpeak\Yves\FirstSpiritContent\Plugin\Twig\CategoryDataTwigFunction;
+use Crownpeak\Yves\FirstSpiritContent\Plugin\Twig\ContentTwigFunction;
+use Crownpeak\Yves\FirstSpiritContent\Plugin\Twig\LinkTwigFunction;
+use Crownpeak\Yves\FirstSpiritContent\Plugin\Twig\ProductDataTwigFunction;
+
 
 // ...
 
@@ -77,8 +124,12 @@ use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Twig\FirstSpiritPreviewConte
     {
         return [
             // ...
-            new FirstSpiritPreviewContentDataTwigFunction(),
-            new FirstSpiritPreviewContentAttributesTwigFunction(),
+            new GlobalsTwigPlugin(),
+            new ContentTwigFunction(),
+            new AttributesTwigFunction(),
+            new ProductDataTwigFunction(),
+            new CategoryDataTwigFunction(),
+            new LinkTwigFunction()
         ];
 ```
 
@@ -88,7 +139,8 @@ Add the following to your `src/Pyz/Yves/Router/RouterDependencyProvider.php` fil
 
 ```php
 // ...
-use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Route\FirstSpiritPreviewContentRoutePlugin;
+use Crownpeak\Yves\FirstSpiritContent\Plugin\Route\CmsBlockRenderRoutePlugin;
+use Crownpeak\Yves\FirstSpiritContent\Plugin\Route\ContentPagesRoutePlugin;
 
 
 // ...
@@ -97,7 +149,8 @@ use Crownpeak\Yves\FirstSpiritPreviewContent\Plugin\Route\FirstSpiritPreviewCont
     {
         return [
             // ...
-            new FirstSpiritPreviewContentRoutePlugin()
+            new CmsBlockRenderRoutePlugin(),
+            new ContentPagesRoutePlugin()
         ];
 ```
 
