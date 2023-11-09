@@ -67,7 +67,7 @@ class AttributesTwigFunction extends AbstractPlugin implements TwigPluginInterfa
 
         $cacheKey = md5($id . $type . $locale . ($isPreview ? 'preview' : 'release'));
 
-        $this->getLogger()->debug('[FirstSpiritContentAttributesTwigFunction] Setting attributes for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
+        $this->getLogger()->debug('[AttributesTwigFunction] Setting attributes for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
 
         $data = null;
         if (!$isPreview && $this->getFactory()->getStorageClient()->hasApiResponse($cacheKey)) {
@@ -76,19 +76,17 @@ class AttributesTwigFunction extends AbstractPlugin implements TwigPluginInterfa
         } else {
             // If not in cache or in preview mode, query
             try {
-                $data = null;
-                if ($isFsDriven) {
-                    $data = ['items' => [$this->getFactory()->getContentJsonFetcherClient()->findElement($id, $locale)]];
-                    $this->getLogger()->debug('[FirstSpiritContentAttributesTwigFunction] Preview ID: ' . $id . ' - Data: ' . json_encode($data));
-                } else {
+                if ($isFsDriven) { // For FS driven pages use findElement
+                    $data = $this->getFactory()->getContentJsonFetcherClient()->findElement($id, $locale);
+                } else { // For shop driven pages use findPage
                     $data = $this->getFactory()->getContentJsonFetcherClient()->findPage($id, $type, $locale);
                 }
-                if ($data) {
+                if (!empty($data) && !is_null($data)) {
                     $this->getFactory()->getStorageClient()->setApiResponse($cacheKey, $data);
                 }
             } catch (\Throwable $th) {
-                $this->getLogger()->error('[FirstSpiritContentAttributesTwigFunction] Cannot get data for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
-                $this->getLogger()->error('[FirstSpiritContentAttributesTwigFunction] ' . $th->getMessage());
+                $this->getLogger()->error('[AttributesTwigFunction] Cannot get data for: ' . $type . ' ' . $id . ' (Preview=' . $isPreview . ')');
+                $this->getLogger()->error('[AttributesTwigFunction] ' . $th->getMessage());
                 $this->getFactory()->getDataStore()->setCurrentPage(null);
                 $this->getFactory()->getDataStore()->setError($th);
                 return '';
@@ -96,15 +94,15 @@ class AttributesTwigFunction extends AbstractPlugin implements TwigPluginInterfa
         }
 
         $previewId = null;
-        if (empty($data) || count($data['items']) === 0) {
-            $this->getLogger()->info('[FirstSpiritContentAttributesTwigFunction] No items found for: ' . $type . ' ' . $id);
+        if (empty($data) || is_null($data)) {
+            $this->getLogger()->info('[AttributesTwigFunction] No element found for: ' . $type . ' ' . $id);
         } else {
-            $pageContent = $data['items'][0];
+            $pageContent = $data;
 
             $previewId = $pageContent['previewId'];
 
             if (!isset($previewId)) {
-                $this->getLogger()->error('[FirstSpiritContentAttributesTwigFunction] No preview ID found');
+                $this->getLogger()->error('[AttributesTwigFunction] No preview ID found');
             } else {
                 // If data is found, save it to factory to access it in other Twig functions later
                 $this->getFactory()->getDataStore()->setCurrentPage($data);

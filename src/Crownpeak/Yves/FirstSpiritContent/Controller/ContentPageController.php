@@ -49,8 +49,7 @@ class ContentPageController extends AbstractController
                 return $this->renderError('Page not found.');
             }
 
-            // TODO: Get rid of this items wrapper globally (see CFCSPRY-71)
-            $this->getFactory()->getDataStore()->setCurrentPage(['items' => [$data]]);
+            $this->getFactory()->getDataStore()->setCurrentPage($data);
 
             $fsPageLayout = $data['layout'];
             $contentPageTemplate = null;

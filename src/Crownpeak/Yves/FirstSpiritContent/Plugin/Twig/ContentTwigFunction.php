@@ -92,12 +92,12 @@ class ContentTwigFunction extends AbstractPlugin implements TwigPluginInterface
             }
         }
 
-        if (empty($data) || count($data['items']) === 0) {
-            $this->getLogger()->info('[ContentTwigFunction] No items found');
+        if (empty($data) || is_null($data)) {
+            $this->getLogger()->info('[ContentTwigFunction] No data for content page found');
             return $this->sectionRenderUtil->decorateSlot('', $slotName);
         }
-        $pageContent = $data['items'][0];
-        $slotContent = NULL;
+        $pageContent = $data;
+        $slotContent = null;
 
         foreach ($pageContent['children'] as $slot) {
             if ($slot['name'] === $slotName) {

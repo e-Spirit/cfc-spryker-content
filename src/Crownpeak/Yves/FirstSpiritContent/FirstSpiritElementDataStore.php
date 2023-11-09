@@ -21,11 +21,11 @@ class FirstSpiritElementDataStore
      */
     public function setCurrentPage(mixed $data)
     {
-        if (empty($data) || count($data['items']) === 0) {
+        if (empty($data) || is_null($data)) {
             $this->getLogger()->warning('[ContentDataStore] Not setting empty result');
             $this->currentPageData = null;
         } else {
-            $this->getLogger()->debug('[ContentDataStore] Setting data for current page ' . $data['items'][0]['previewId']);
+            $this->getLogger()->debug('[ContentDataStore] Setting data for current page ' . $data['previewId']);
             $this->currentPageData = $data;
         }
         $this->error = null;
@@ -38,7 +38,7 @@ class FirstSpiritElementDataStore
     public function getCurrentPage()
     {
         if (!is_null($this->currentPageData)) {
-            $this->getLogger()->debug('[ContentDataStore] Getting data for current page ' . $this->currentPageData['items'][0]['previewId']);
+            $this->getLogger()->debug('[ContentDataStore] Getting data for current page ' . $this->currentPageData['previewId']);
             return $this->currentPageData;
         }
         $this->getLogger()->warning('[ContentDataStore] No data set for current page');
