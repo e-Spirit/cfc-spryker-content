@@ -29,10 +29,11 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
      * @param string $id ID of the page to get.
      * @param string $type Type of the page to get
      * @param string $locale The locale to use for the request.
-     * @return array The result of findElement call.
+     * @return ?array The result of findPage call.
+
      * @throws ContentClientException
      */
-    public function findPage(mixed $id, string $type, string $locale): array
+    public function findPage(mixed $id, string $type, string $locale): ?array
     {
         $url = $this->apiHost . (str_ends_with($this->apiHost, '/') ? '' : '/') . 'findpage';
 
@@ -56,10 +57,10 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
      * 
      * @param string $fsPageId The ID of the FirstSpirit page.
      * @param string $locale The locale to use for the request.
-     * @return array The result of findElement call.
+     * @return ?array The result of findElement call.
      * @throws ContentClientException
      */
-    public function findElement(mixed $fsPageId, string $locale): array
+    public function findElement(mixed $fsPageId, string $locale): ?array
     {
         $url = $this->apiHost . (str_ends_with($this->apiHost, '/') ? '' : '/') . 'findelement';
 
@@ -80,10 +81,11 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
      * Executes fetchNavigation call to the CFC Frontend API server and returns the result.
      * 
      * @param string $locale The locale to use for the request.
-     * @return array The result of findElement call.
+     * @return ?array The result of findNavigation call.
+
      * @throws ContentClientException
      */
-    public function fetchNavigation(string $locale): array
+    public function fetchNavigation(string $locale): ?array
     {
         $url = $this->apiHost . (str_ends_with($this->apiHost, '/') ? '' : '/') . 'fetchNavigation';
 
@@ -150,7 +152,6 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
 
         // Do soft logging if the url is not reachable
         $data = array();
-        $items = 0;
         if ($curlData === false) {
             $this->getLogger()->error('[FrontendApiServerClient] No data received: ' . $url);
         } else {
@@ -158,8 +159,6 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
         }
 
         curl_close($ch);
-
-        $this->getLogger()->debug('[FrontendApiServerClient] Found ' . $items . ' elements');
 
         return $data;
     }
