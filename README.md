@@ -27,7 +27,6 @@ use Spryker\Shared\Kernel\KernelConstants;
 // Allow the Twig template of our reference components to be used
 $config[KernelConstants::PROJECT_NAMESPACES] = [
   'Pyz',
-  'EcomExtra',
   'Crownpeak',
 ];
 
