@@ -7,14 +7,14 @@ Add the following to your `composer.json` file
 ```json
     "repositories": [
         {
-            "url": "https://github.com/ecom-espirit/cfc-spryker-content.git",
+            "url": "https://github.com/e-spirit/cfc-spryker-content.git",
             "type": "vcs"
         }
     ],
 ```
 and run
 ```
-$ composer require ecom-espirit/cfc-spryker-content
+$ composer require e-spirit/cfc-spryker-content
 ```
 ## Configuration
 Add the following to your configuration:
@@ -27,7 +27,6 @@ use Spryker\Shared\Kernel\KernelConstants;
 // Allow the Twig template of our reference components to be used
 $config[KernelConstants::PROJECT_NAMESPACES] = [
   'Pyz',
-  'EcomExtra',
   'Crownpeak',
 ];
 
@@ -155,6 +154,16 @@ use Crownpeak\Yves\FirstSpiritContent\Plugin\Route\ContentPagesRoutePlugin;
 ```
 
 ## Extend Twig templates
+
+### Main page layout
+Add this at the end of the `src/Pyz/Yves/ShopUi/Theme/default/templates/page-layout-main/page-layout-main.twig` file:
+```twig
+{% block footerScripts %}
+    {{ parent() }}
+    {{ firstSpiritCfcScriptUrl|raw }}
+{% endblock %}
+```
+
 
 ### Product template
 Modify the `src/Pyz/Yves/ProductDetailPage/Theme/default/views/pdp/pdp.twig` file:
@@ -288,9 +297,70 @@ Create the file `src/Pyz/Shared/CmsBlock/Theme/default/template/fs_content_block
 {% endblock %} 
 ```
 
+### FirstSpirit driven content pages
+Create the file `src/Pyz/Yves/FirstSpiritUi/Theme/default/views/fs-content-page/fs-content-page.twig` with the following content:
+```twig
+{% extends template('page-layout-main') %}
+
+{% block attributes %}
+    {{ parent() }}
+    {{ firstSpiritAttributes(contentPageData.refId, "content", "content", title, data.appLocale) }}
+{% endblock %}
+
+
+{% block container %}
+    <div class="container">
+        <div class="container__inner">
+            {% block breadcrumbs %}{% endblock %}
+        </div>
+    </div>
+
+    <div class="container">
+        <main class="container__inner">
+
+
+            {% block title %}
+                <h1 class="title title--main title--h2 title--medium spacing-y">{{ title }}</h1>
+            {% endblock %}
+
+            {% block content %}
+                {{ firstSpiritContent('stage') | raw }}
+
+                {{ firstSpiritContent('content') | raw }}
+            {% endblock %}
+        </main>
+    </div>
+{% endblock %}
+```
+
+
+### FirstSpirit error page
+Create the file `src/Pyz/Yves/FirstSpiritUi/Theme/default/views/fs-error/fs-error.twig` with the following content:
+```twig
+{% extends template('page-layout-main') %}
+
+{% block container %}
+    <div class="container">
+        <main class="container__inner">
+
+
+            {% block title %}
+                <h1 class="title title--main title--h2 title--medium spacing-y">{{ title }}</h1>
+            {% endblock %}
+
+            {% block content %}
+                <p class="text-center">
+                    {{ error }}
+                </p>
+            {% endblock %}
+        </main>
+    </div>
+{% endblock %}
+```
+
 
 ## Testing
 To test a particular branch in your Spryker installation replace _{branchname}_ in the command below:
 ```
-$ docker/sdk cli composer require ecom-espirit/cfc-spryker-content:dev-{branchname}
+$ docker/sdk cli composer require e-spirit/cfc-spryker-content:dev-{branchname}
 ```
