@@ -156,16 +156,8 @@ use Crownpeak\Yves\FirstSpiritContent\Plugin\Route\ContentPagesRoutePlugin;
 ## Extend Twig templates
 
 ### Main page layout
-Modify the `src/Pyz/Yves/ShopUi/Theme/default/templates/page-layout-main/page-layout-main.twig` file:
+Add this at the end of the `src/Pyz/Yves/ShopUi/Theme/default/templates/page-layout-main/page-layout-main.twig` file:
 ```twig
-{% extends template('page-layout-main', '@SprykerShop:ShopUi') %}
-
-{% define data = {
-	@@ -158,3 +162,10 @@
-        {% include organism('notification-area') only %}
-    {% endblock %}
-{% endblock %}
-
 {% block footerScripts %}
     {{ parent() }}
     {{ firstSpiritCfcScriptUrl|raw }}
