@@ -5,7 +5,7 @@ namespace Crownpeak\Yves\FirstSpiritContent\Plugin\Twig;
 use Spryker\Shared\Log\LoggerTrait;
 use Twig\Environment;
 use Crownpeak\Yves\FirstSpiritContent\FirstSpiritContentFactory;
-use Crownpeak\Yves\FirstSpiritContent\Exception\FirstSpiritContentTemplateException;
+use Crownpeak\Yves\FirstSpiritContent\Exception\TemplateException;
 
 /**
  * Utility class to render sections.
@@ -41,7 +41,7 @@ class SectionRenderUtil
                 $fullTemplate = $this->getTemplateForSection($section);
                 $splitTemplate = explode('/', $fullTemplate);
                 if (count($splitTemplate) !== 2) {
-                    throw new FirstSpiritContentTemplateException('Invalid template path ' . $fullTemplate);
+                    throw new TemplateException('Invalid template path ' . $fullTemplate);
                 }
                 $templateModule = $splitTemplate[0];
                 $template = $splitTemplate[1];
@@ -159,7 +159,7 @@ class SectionRenderUtil
             return $fallbackTemplateName;
         } else {
             $this->getLogger()->warning('[SectionRenderUtil] No mapping found for ' . $sectionType);
-            throw new FirstSpiritContentTemplateException('No mapping found for ' . $sectionType);
+            throw new TemplateException('No mapping found for ' . $sectionType);
         }
     }
 }
