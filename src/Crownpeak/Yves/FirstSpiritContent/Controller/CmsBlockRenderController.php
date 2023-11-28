@@ -40,16 +40,16 @@ class CmsBlockRenderController extends AbstractController
         $sectionId = $request->get('sectionId');
         $wrapRequired = strtolower($request->get('wrap', '')) === 'true';
         $locale = $request->get('locale');
-        if (!is_string($fsPageId)) {
-            $this->getLogger()->warning('[CmsBlockRenderController] Malformatted fsPageId received');
+        if (empty($fsPageId)) {
+            $this->getLogger()->warning('[CmsBlockRenderController] No fsPageId received');
             return $this->jsonResponse([
-                'error' => 'Malformatted fsPageId received'
+                'error' => 'No fsPageId received'
             ], 400);
         }
-        if (!is_string($sectionId)) {
-            $this->getLogger()->warning('[CmsBlockRenderController] Malformatted sectionId received');
+        if (empty($sectionId)) {
+            $this->getLogger()->warning('[CmsBlockRenderController] No sectionId received');
             return $this->jsonResponse([
-                'error' => 'Malformatted sectionId received'
+                'error' => 'No sectionId received'
             ], 400);
         }
 

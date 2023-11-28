@@ -23,12 +23,17 @@ const reloadContent = (node, fsPageId, locale, sectionId, sibling) => {
           console.log('Script tag detected, reloading page');
           return location.reload();
         }
-        !sibling
-          ? (node.innerHTML = data.renderResult)
-          : node
-              .querySelector(`[data-preview-id="${sibling}"]`)
-              .insertAdjacentHTML('afterend', data.renderResult);
+        if (sibling) {
+          node
+            .querySelector(`[data-preview-id="${sibling}"]`)
+            .insertAdjacentHTML('afterend', data.renderResult);
+        } else {
+          node.innerHTML = data.renderResult
+        }
         enable(node);
+      } else {
+        console.error('Failed to load partial content', data);
+        location.reload();
       }
     })
     .catch((err) => {
@@ -51,9 +56,21 @@ FCECOM.addHook('contentChanged', (args) => {
   return reloadContent(args.node, fsPageId, locale, sectionId);
 });
 FCECOM.addHook('sectionCreated', (args) => {
-  const fsPageId = document.body.dataset.fsPreviewId.split('.')[0];
+  const fsPageId = args.pageId.split('.')[0];
+  if (!fsPageId) {
+    console.error('No pageId set', args);
+    return location.reload();
+  }
   const locale = args.pageId.split('.')[1];
+  if (!locale) {
+    console.error('No locale set', args);
+    return location.reload();
+  }
   const sectionId = args.identifier;
+  if (!sectionId) {
+    console.error('No sectionId set', args);
+    return location.reload();
+  }
   const node = document.querySelector(
     `[data-fcecom-slot-name="${args.slotName}"]`
   );
@@ -75,6 +92,7 @@ FCECOM.addHook('requestPreviewElement', (args) => {
       if (data.url) {
         window.location.href = data.url;
       }
+      enable();
     })
     .catch((err) => {
       console.log('Failed to get URL', err);
