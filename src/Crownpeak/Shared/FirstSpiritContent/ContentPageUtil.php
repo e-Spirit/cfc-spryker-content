@@ -33,6 +33,10 @@ class ContentPageUtil
         $url = null;
 
         if (!is_null($data['customData']) && is_string($data['customData']['pageTemplate'])) {
+            // Check for homepage
+            if (array_key_exists('ecomShopId', $data['customData']) &&  $data['customData']['ecomShopId'] === 'homepage') {
+                return '/';
+            }
             $fsPageLayout = $data['customData']['pageTemplate'];
             $contentPageTemplate = $this->getContentPageTemplate($fsPageLayout);
 
@@ -124,6 +128,7 @@ class ContentPageUtil
 
     /**
      * Transforms the given seoRoute as received from the Navigation Service and extracts the URL part.
+     * Will always have a leading slash.
      * 
      * @param string $url The URL to strip.
      * @return string The transformed URL.
@@ -134,7 +139,9 @@ class ContentPageUtil
             return preg_replace('/\/index\-?[\w\d]?\.json$/', '', $url);
         }
         $parts = explode('/', $url);
-        return str_replace('.json', '', array_pop($parts));
+        $route = str_replace('.json', '', array_pop($parts));
+        if (!str_starts_with($route, '/')) $route = '/' . $route;
+        return $route;
     }
 
     /**
