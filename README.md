@@ -175,7 +175,7 @@ Modify the `src/Pyz/Yves/ProductDetailPage/Theme/default/views/pdp/pdp.twig` fil
 
 {% block attributes %}
     {{ parent() }}
-    {{ firstSpiritAttributes(data.product.idProductAbstract, "product", "product", data.title, data.appLocale) }}
+    {{ firstSpiritAttributes("%'03.3s"|format(data.product.idProductAbstract), "product", "product", data.title, data.appLocale) }}
 {% endblock %}
 {% block pageInfo %}
 
