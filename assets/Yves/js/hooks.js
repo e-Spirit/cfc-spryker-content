@@ -101,14 +101,26 @@ FCECOM.addHook('requestPreviewElement', (args) => {
 
 // Overwrite default hook implementation to include disable()
 FCECOM.addHook('openStoreFrontUrl', (payload) => {
-  if (payload.id === 'homepage') {
-    disable();
-    window.location.href = '/';
-    return;
-  }
   const targetUrl = window.location.origin + payload.url;
   if (payload.url && !window.location.href.includes(targetUrl)) {
     disable();
     window.location.href = targetUrl;
+  } else if (payload.id) {
+    const params = new URLSearchParams({
+      id: payload.id
+    });
+    disable();
+    fetch(`/getStaticPageUrl?${params}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        if (data.url) {
+          window.location.href = data.url;
+        }
+        enable();
+      })
+      .catch((err) => {
+        console.log('Failed to get URL', err);
+      });
   }
 });
