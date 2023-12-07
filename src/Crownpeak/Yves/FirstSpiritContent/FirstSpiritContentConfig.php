@@ -91,6 +91,14 @@ class FirstSpiritContentConfig extends AbstractBundleConfig
     }
 
     /**
+     * @return array Mapping of URLs for static pages.
+     */
+    public function getStaticPageUrlMapping(): array
+    {
+        return $this->get(FirstSpiritContentConstants::FIRSTSPIRIT_STATIC_PAGE_URL_MAPPING, []);
+    }
+
+    /**
      * @return string URL of the CFC Frontend API client script (static.js).
      */
     public function getRenderingScriptUrl(): string

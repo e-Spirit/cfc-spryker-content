@@ -63,4 +63,8 @@ interface FirstSpiritContentConstants
      * Key to be used in the content page template mapping to map errors to a Twig template.
      */
     public const FIRSTSPIRIT_CONTENT_PAGE_TEMPLATE_MAPPING_ERROR = 'FIRSTSPIRIT_CONTENT_PAGE_TEMPLATE_MAPPING_ERROR';
+    /**
+     * Mapping of URLs to static page IDs.
+     */
+    public const FIRSTSPIRIT_STATIC_PAGE_URL_MAPPING = 'FIRSTSPIRIT_STATIC_PAGE_URL_MAPPING';
 }
