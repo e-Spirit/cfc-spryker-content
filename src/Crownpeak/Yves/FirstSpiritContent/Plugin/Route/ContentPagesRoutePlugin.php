@@ -19,8 +19,11 @@ class ContentPagesRoutePlugin extends AbstractRouteProviderPlugin
     protected const CONTENT_PAGE_RENDER_PATH_VARIABLE = 'content';
     protected const CONTENT_PAGE_RENDER_URL_PATTERN = '[\\w\\-_\\d\\/]+';
 
-    protected const CONTENT_PAGE_GET_URL_ACTION = 'getUrl';
+    protected const CONTENT_PAGE_GET_URL_ACTION = 'getContentPageUrl';
     protected const CONTENT_PAGE_GET_URL_PATH_VARIABLE = 'getContentPageUrl';
+
+    protected const STATIC_PAGE_GET_URL_ACTION = 'getStaticPageUrl';
+    protected const STATIC_PAGE_GET_URL_PATH_VARIABLE = 'getStaticPageUrl';
 
 
     /**
@@ -32,6 +35,7 @@ class ContentPagesRoutePlugin extends AbstractRouteProviderPlugin
 
         $routeCollection->add($this->getConfig()->getContentPageUrlPrefix(), $this->buildContentPageRenderRoute());
         $routeCollection->add(self::CONTENT_PAGE_GET_URL_PATH_VARIABLE, $this->buildContentPageGetUrlRoute());
+        $routeCollection->add(self::STATIC_PAGE_GET_URL_PATH_VARIABLE, $this->buildStaticPageGetUrlRoute());
 
         return $routeCollection;
     }
@@ -50,6 +54,7 @@ class ContentPagesRoutePlugin extends AbstractRouteProviderPlugin
 
         return $route;
     }
+
     /**
      * Build the route to retrieve content page URLs.
      *
@@ -59,6 +64,20 @@ class ContentPagesRoutePlugin extends AbstractRouteProviderPlugin
     {
         $path = '/' . self::CONTENT_PAGE_GET_URL_PATH_VARIABLE;
         $route = $this->buildRoute($path, self::FIRST_SPIRIT_PREVIEW_MODULE_BUNDLE, self::FS_CONTENT_PAGE_CONTROLLER, self::CONTENT_PAGE_GET_URL_ACTION);
+        $route->setMethods('GET');
+
+        return $route;
+    }
+
+    /**
+     * Build the route to retrieve static page URLs.
+     *
+     * @return Route The created route.
+     */
+    protected function buildStaticPageGetUrlRoute(): Route
+    {
+        $path = '/' . self::STATIC_PAGE_GET_URL_PATH_VARIABLE;
+        $route = $this->buildRoute($path, self::FIRST_SPIRIT_PREVIEW_MODULE_BUNDLE, self::FS_CONTENT_PAGE_CONTROLLER, self::STATIC_PAGE_GET_URL_ACTION);
         $route->setMethods('GET');
 
         return $route;
