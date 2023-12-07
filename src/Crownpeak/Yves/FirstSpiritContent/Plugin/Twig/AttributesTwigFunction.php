@@ -24,7 +24,7 @@ class AttributesTwigFunction extends AbstractPlugin implements TwigPluginInterfa
 
     /**
      * This is the name of the global function that will be available in the twig templates.
-     * usage: {{ firstSpiritAttributes(id, type, template, title, locale) }}
+     * usage: {{ firstSpiritAttributes(id, type, template, title, locale [,isFsDriven]) }}
      */
     protected const FIRSTSPIRIT_CFC_ATTRIBUTES_SCRIPT_DATA = 'firstSpiritAttributes';
 
@@ -58,11 +58,11 @@ class AttributesTwigFunction extends AbstractPlugin implements TwigPluginInterfa
      * @param $template Template of the page.
      * @param $title Title of the page.
      * @param $locale Locale of the page.
+     * @param $isFsDriven Whether the page is FirstSpriti driven, default is false.
      * @return string The Attributes to add to the body tag.
      */
-    public function firstSpiritAttributes($id, $type, $template, $title, $locale): string
+    public function firstSpiritAttributes($id, $type, $template, $title, $locale, $isFsDriven = false): string
     {
-        $isFsDriven = $type === 'content' && $id !== 'homepage';
         $isPreview = $this->getFactory()->getPreviewService()->isPreview();
 
         $cacheKey = md5($id . $type . $locale . ($isPreview ? 'preview' : 'release'));
