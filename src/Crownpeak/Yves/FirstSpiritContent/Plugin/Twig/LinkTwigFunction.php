@@ -3,6 +3,7 @@
 namespace Crownpeak\Yves\FirstSpiritContent\Plugin\Twig;
 
 use Crownpeak\Shared\FirstSpiritContent\ContentPageUtil;
+use Crownpeak\Shared\FirstSpiritContent\StaticPageUtil;
 use Spryker\Service\Container\ContainerInterface;
 use Spryker\Shared\Log\LoggerTrait;
 use Spryker\Yves\Kernel\AbstractPlugin;
@@ -38,6 +39,8 @@ class LinkTwigFunction extends AbstractPlugin implements TwigPluginInterface
 
     protected SectionRenderUtil $sectionRenderUtil;
     protected ContentPageUtil $contentPageUtil;
+    protected StaticPageUtil $staticPageUtil;
+
 
     /**
      * @api
@@ -55,6 +58,7 @@ class LinkTwigFunction extends AbstractPlugin implements TwigPluginInterface
             $this->getConfig()
         );
         $this->contentPageUtil = new ContentPageUtil($this->getFactory());
+        $this->staticPageUtil = new StaticPageUtil($this->getFactory());
 
         $twig->addFunction(
             new TwigFunction(
@@ -96,10 +100,32 @@ class LinkTwigFunction extends AbstractPlugin implements TwigPluginInterface
             // Content pages
             if (isset($linkData['lt_pageref']) && isset($linkData['lt_pageref']['referenceId'])) {
                 $pageId = $linkData['lt_pageref']['referenceId'];
-                $url = $this->contentPageUtil->getUrl($pageId, $this->getLocale());
+                $contentPageUrl = $this->contentPageUtil->getUrl($pageId, $this->getLocale());
+
+                $url = null;
+                if (!is_null($contentPageUrl)) {
+                    $url = $contentPageUrl;
+                    $this->getLogger()->debug('[FirstSpiritPreviewLinkTwigFunction] Page is a content page with URL: ' . $url);
+                } else {
+                    try {
+                        $navigationServiceEntry = $this->contentPageUtil->getNavigationServiceEntryByPageId($pageId, $this->getLocale());
+
+                        if ($navigationServiceEntry && !is_null($navigationServiceEntry['customData']['ecomShopId'])) {
+                            $ecomId = $navigationServiceEntry['customData']['ecomShopId'];
+                            $staticPageUrl = $this->staticPageUtil->getUrl($ecomId, $this->getLocale());
+
+                            if ($staticPageUrl) {
+                                $url = $staticPageUrl;
+                                $this->getLogger()->debug('[FirstSpiritPreviewLinkTwigFunction] Page is a static page (' . $ecomId . ') with URL: ' . $url);
+                            }
+                        }
+                    } catch (\Throwable $th) {
+                        // It is not avilable
+                    }
+                }
 
                 if (is_null($url)) {
-                    $this->getLogger()->warning('[FirstSpiritPreviewLinkTwigFunction] Cannot get URL for content page ' . $pageId);
+                    $this->getLogger()->warning('[FirstSpiritPreviewLinkTwigFunction] Cannot get URL for content or static page ' . $pageId);
                 } else {
                     return $url;
                 }

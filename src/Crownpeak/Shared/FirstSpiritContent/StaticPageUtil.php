@@ -44,7 +44,7 @@ class StaticPageUtil
             $this->getLogger()->error('[StaticPageUtil] Invalid URL configured for ID: ' . $id);
             return null;
         }
-        $this->getLogger()->error('[ContentPageUtil] No URL configured for ID: ' . $id);
+        $this->getLogger()->error('[StaticPageUtil] No URL configured for ID: ' . $id);
         return null;
     }
 
