@@ -24,7 +24,7 @@ class AttributesTwigFunction extends AbstractPlugin implements TwigPluginInterfa
 
     /**
      * This is the name of the global function that will be available in the twig templates.
-     * usage: {{ firstSpiritAttributes(id, type, template, title, locale [,isFsDriven]) }}
+     * usage: {{ firstSpiritAttributes(id, type, template, title, locale, [isFsDriven]) }}
      */
     protected const FIRSTSPIRIT_CFC_ATTRIBUTES_SCRIPT_DATA = 'firstSpiritAttributes';
 
