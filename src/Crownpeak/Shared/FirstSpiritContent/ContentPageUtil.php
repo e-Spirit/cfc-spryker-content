@@ -114,7 +114,7 @@ class ContentPageUtil
      * @param string $locale The locale to pass.
      * @return array Information about the matching Navigation Service entry.
      */
-    private function getNavigationServiceEntryByPageId(string $pageId, string $locale): array
+    public function getNavigationServiceEntryByPageId(string $pageId, string $locale): array
     {
         $navigationData = $this->getFactory()->getContentJsonFetcherClient()->fetchNavigation($locale);
         $idMap = $navigationData['idMap'];

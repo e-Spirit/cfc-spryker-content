@@ -4,6 +4,7 @@ namespace Crownpeak\Yves\FirstSpiritContent\Controller;
 
 use Crownpeak\Shared\FirstSpiritContent\ContentPageUtil;
 use Crownpeak\Shared\FirstSpiritContent\FirstSpiritContentConstants;
+use Crownpeak\Shared\FirstSpiritContent\StaticPageUtil;
 use Crownpeak\Yves\FirstSpiritContent\Exception\ContentPageException;
 use Spryker\Shared\Log\LoggerTrait;
 use SprykerShop\Yves\ShopApplication\Controller\AbstractController;
@@ -22,10 +23,12 @@ class ContentPageController extends AbstractController
     use LoggerTrait;
 
     private ContentPageUtil $contentPageUtil;
+    private StaticPageUtil $staticPageUtil;
 
     public function __construct()
     {
         $this->contentPageUtil = new ContentPageUtil($this->getFactory());
+        $this->staticPageUtil = new StaticPageUtil($this->getFactory());
     }
 
     /**
@@ -78,19 +81,19 @@ class ContentPageController extends AbstractController
     }
 
     /**
-     * Action to return the URL based on the given FirstSpirit ID.
+     * Action to return the content page URL based on the given FirstSpirit ID.
      * Returns JSON format.
      * 
      * @param Request $request The request that triggered the action.
      * @return Response The response to pass to the client.
      */
-    public function getUrlAction(Request $request): Response
+    public function getContentPageUrlAction(Request $request): Response
     {
 
         $fsPageId = $request->get('pageId');
         $locale = $request->get('locale');
 
-        if (!is_string($fsPageId)) {
+        if (empty($fsPageId)) {
             $this->getLogger()->warning('[ContentPageController] Malformatted fsPageId received');
             return $this->jsonResponse([
                 'error' => 'Malformatted fsPageId received'
@@ -98,6 +101,34 @@ class ContentPageController extends AbstractController
         }
 
         $url = $this->contentPageUtil->getUrl($fsPageId, $locale);
+
+        return $this->jsonResponse([
+            'url' => $url
+        ]);
+    }
+
+
+    /**
+     * Action to return the static page URL based on the given FirstSpirit ID.
+     * Returns JSON format.
+     * 
+     * @param Request $request The request that triggered the action.
+     * @return Response The response to pass to the client.
+     */
+    public function getStaticPageUrlAction(Request $request): Response
+    {
+
+        $id = $request->get('id');
+        $locale = $request->getLocale();
+
+        if (empty($id)) {
+            $this->getLogger()->warning('[ContentPageController] Malformatted id received');
+            return $this->jsonResponse([
+                'error' => 'Malformatted id received'
+            ], 400);
+        }
+
+        $url = $this->staticPageUtil->getUrl($id, $locale);
 
         return $this->jsonResponse([
             'url' => $url

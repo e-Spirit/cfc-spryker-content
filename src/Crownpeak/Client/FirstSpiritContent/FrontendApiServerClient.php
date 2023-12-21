@@ -141,6 +141,13 @@ class FrontendApiServerClient extends AbstractClient implements FrontendApiServe
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curlErrNo = curl_errno($ch);
 
+
+        // No result is a valid response
+        if ($httpCode == 404) {
+            $this->getLogger()->error('[FrontendApiServerClient] No content found for: ' . $url . ' (HTTP status ' . $httpCode . ')');
+            return null;
+        }
+
         if ($httpCode >= 400) {
             $this->getLogger()->error('[FrontendApiServerClient] Failed to fetch: ' . $url . ' (HTTP status ' . $httpCode . ')');
             throw new ContentClientException('Failed to fetch (HTTP status ' . $httpCode . ')');
