@@ -14,6 +14,8 @@ class SessionClientBridge
 
     private const FIRSTSPIRIT_PREVIEW_MODE = 'fsPreviewMode';
     private const FIRSTSPIRIT_REFERER = 'fsReferer';
+    private const FIRSTSPIRIT_CURRENT_PAGE_DATA = 'fsCurrentPageData';
+    private const FIRSTSPIRIT_CURRENT_PAGE_ERROR = 'fsCurrentPageError';
 
     private SessionClient $sessionClient;
 
@@ -95,5 +97,77 @@ class SessionClientBridge
     {
 
         return $this->sessionClient->has(self::FIRSTSPIRIT_REFERER);
+    }
+
+    /**
+     * Sets the given current page data in the session.
+     *
+     * @param ?array $data The data to set for the current page.
+     * @return void
+     */
+    public function setCurrentPage(?array $data)
+    {
+        $this->sessionClient->set(self::FIRSTSPIRIT_CURRENT_PAGE_DATA, $data);
+        $this->sessionClient->save();
+    }
+
+    /**
+     * Returns the current page data.
+     *
+     * @return ?array The stored current page data or null.
+     */
+    public function getCurrenPage(): array
+    {
+        if ($this->hasCurrentPage()) {
+            return $this->sessionClient->get(self::FIRSTSPIRIT_CURRENT_PAGE_DATA);
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the session contains current page data.
+     *
+     * @return bool Whether the session contains current page data.
+     */
+    public function hasCurrentPage(): bool
+    {
+
+        return $this->sessionClient->has(self::FIRSTSPIRIT_CURRENT_PAGE_DATA);
+    }
+
+    /**
+     * Sets the given current error in the session.
+     *
+     * @param \Throwable $th The error to store.
+     * @return void
+     */
+    public function setCurrentError(\Throwable $th)
+    {
+        $this->sessionClient->set(self::FIRSTSPIRIT_CURRENT_PAGE_ERROR, $th);
+        $this->sessionClient->save();
+    }
+
+    /**
+     * Returns the current page data.
+     *
+     * @return \Throwable The stored current error or null.
+     */
+    public function getCurrentError(): \Throwable
+    {
+        if ($this->hasCurrentError()) {
+            return $this->sessionClient->get(self::FIRSTSPIRIT_CURRENT_PAGE_ERROR);
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the session contains current error.
+     *
+     * @return bool Whether the session contains current error.
+     */
+    public function hasCurrentError(): bool
+    {
+
+        return $this->sessionClient->has(self::FIRSTSPIRIT_CURRENT_PAGE_ERROR);
     }
 }

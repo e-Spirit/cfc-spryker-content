@@ -2,6 +2,7 @@
 
 namespace Crownpeak\Yves\FirstSpiritContent;
 
+use Crownpeak\Yves\FirstSpiritContent\Dependency\Client\SessionClientBridge;
 use Spryker\Shared\Log\LoggerTrait;
 
 /**
@@ -13,6 +14,15 @@ class FirstSpiritElementDataStore
 
     private mixed $currentPageData = null;
     private ?\Throwable $error = null;
+    private SessionClientBridge $sessionClient;
+
+
+
+    public function __construct(SessionClientBridge $sessionClient)
+    {
+        $this->sessionClient = $sessionClient;
+    }
+
 
     /**
      * Sets the FS data for the current page.
@@ -22,11 +32,11 @@ class FirstSpiritElementDataStore
     public function setCurrentPage(mixed $data)
     {
         if (empty($data) || is_null($data)) {
-            $this->getLogger()->warning('[ContentDataStore] Not setting empty result');
-            $this->currentPageData = null;
+            $this->getLogger()->warning('[ContentDataStore] Setting empty result');
+            $this->sessionClient->setCurrentPage(null);
         } else {
             $this->getLogger()->debug('[ContentDataStore] Setting data for current page ' . $data['previewId']);
-            $this->currentPageData = $data;
+            $this->sessionClient->setCurrentPage($data);
         }
         $this->error = null;
     }
@@ -37,9 +47,10 @@ class FirstSpiritElementDataStore
      */
     public function getCurrentPage()
     {
-        if (!is_null($this->currentPageData)) {
-            $this->getLogger()->debug('[ContentDataStore] Getting data for current page ' . $this->currentPageData['previewId']);
-            return $this->currentPageData;
+        if ($this->sessionClient->hasCurrentPage()) {
+            $currentPageData = $this->sessionClient->getCurrenPage();
+            $this->getLogger()->debug('[ContentDataStore] Getting data for current page ' . $currentPageData['previewId']);
+            return $currentPageData;
         }
         $this->getLogger()->warning('[ContentDataStore] No data set for current page');
         return null;
@@ -53,7 +64,7 @@ class FirstSpiritElementDataStore
      */
     public function setError(\Throwable $th)
     {
-        $this->error = $th;
+        $this->sessionClient->setCurrentError($th);
     }
 
     /**
@@ -64,6 +75,6 @@ class FirstSpiritElementDataStore
      */
     public function getError()
     {
-        return $this->error;
+        return $this->sessionClient->getCurrentError();
     }
 }
