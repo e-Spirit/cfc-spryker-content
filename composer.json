@@ -2,7 +2,7 @@
   "name": "e-spirit/cfc-spryker-content",
   "description": "FirstSpirit CMS Content for Spryker",
   "type": "library",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "autoload": {
     "psr-4": {
       "Crownpeak\\": "src/Crownpeak/"
