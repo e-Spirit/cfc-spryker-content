@@ -152,7 +152,7 @@ class SessionClientBridge
      *
      * @return \Throwable The stored current error or null.
      */
-    public function getCurrentError(): \Throwable
+    public function getCurrentError(): ?\Throwable
     {
         if ($this->hasCurrentError()) {
             return $this->sessionClient->get(self::FIRSTSPIRIT_CURRENT_PAGE_ERROR);

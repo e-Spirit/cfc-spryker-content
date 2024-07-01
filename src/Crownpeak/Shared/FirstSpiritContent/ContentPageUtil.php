@@ -157,7 +157,7 @@ class ContentPageUtil
         $idMap = $navigationData['idMap'];
 
         foreach ($idMap as $id => $pageData) {
-            if ($this->matchesSeoRoute($pageData['seoRoute'], $contentPageUrl)) {
+            if (!is_null($pageData['seoRoute']) && $this->matchesSeoRoute($pageData['seoRoute'], $contentPageUrl)) {
                 return $pageData;
             }
         }
@@ -176,11 +176,12 @@ class ContentPageUtil
     {
         $regex = '/\/' . preg_quote(strtolower($url), '/') . '\/index\-?[\w\d]?\.json$/';
 
-        if (preg_match($regex, strtolower($seoRoute))) {
-            return true;
-        }
-
-        if (str_ends_with(strtolower($seoRoute), strtolower('/' . $url . '.json'))) {
+        if (
+            preg_match($regex, strtolower($seoRoute))
+            || str_ends_with(strtolower($seoRoute), strtolower('/' . $url . '.json'))
+            || str_ends_with(strtolower($seoRoute), strtolower('/' . $url . '/'))
+            || str_ends_with(strtolower($seoRoute), strtolower('/' . $url))
+        ) {
             return true;
         }
 
