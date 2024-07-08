@@ -87,11 +87,10 @@ class SectionRenderUtil
     public function decorateSection(string $content, string $previewId = ''): string
     {
         $isPreview = $this->getFactory()->getPreviewService()->isPreview();
-        $decoratedContent = '<div';
         if ($isPreview && !empty($previewId)) {
-            $decoratedContent .= ' data-preview-id="' . $previewId . '"';
+            return preg_replace('/<div/', '<div data-preview-id="' . $previewId . '"', $content, 1);
         }
-        return $decoratedContent . '>' . $content . '</div>';
+        return $content;
     }
 
     /**
