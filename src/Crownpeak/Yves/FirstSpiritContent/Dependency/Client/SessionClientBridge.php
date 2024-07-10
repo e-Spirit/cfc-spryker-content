@@ -115,7 +115,7 @@ class SessionClientBridge
      *
      * @return ?array The stored current page data or null.
      */
-    public function getCurrenPage(): array
+    public function getCurrenPage(): ?array
     {
         if ($this->hasCurrentPage()) {
             return $this->sessionClient->get(self::FIRSTSPIRIT_CURRENT_PAGE_DATA);
