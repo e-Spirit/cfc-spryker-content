@@ -64,7 +64,7 @@ class FirstSpiritElementDataStore
      */
     public function setError(\Throwable $th)
     {
-        $this->sessionClient->setCurrentError($th);
+        $this->error = $th;
     }
 
     /**
@@ -75,6 +75,6 @@ class FirstSpiritElementDataStore
      */
     public function getError()
     {
-        return $this->sessionClient->getCurrentError();
+        return $this->error;
     }
 }
