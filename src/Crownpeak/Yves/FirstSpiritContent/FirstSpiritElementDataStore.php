@@ -49,8 +49,10 @@ class FirstSpiritElementDataStore
     {
         if ($this->sessionClient->hasCurrentPage()) {
             $currentPageData = $this->sessionClient->getCurrenPage();
-            $this->getLogger()->debug('[ContentDataStore] Getting data for current page ' . $currentPageData['previewId']);
-            return $currentPageData;
+            if (!is_null($currentPageData)) {
+                $this->getLogger()->debug('[ContentDataStore] Getting data for current page ' . $currentPageData['previewId']);
+                return $currentPageData;
+            }
         }
         $this->getLogger()->warning('[ContentDataStore] No data set for current page');
         return null;
