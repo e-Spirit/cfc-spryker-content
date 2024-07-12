@@ -49,8 +49,10 @@ class FirstSpiritElementDataStore
     {
         if ($this->sessionClient->hasCurrentPage()) {
             $currentPageData = $this->sessionClient->getCurrenPage();
-            $this->getLogger()->debug('[ContentDataStore] Getting data for current page ' . $currentPageData['previewId']);
-            return $currentPageData;
+            if (!is_null($currentPageData)) {
+                $this->getLogger()->debug('[ContentDataStore] Getting data for current page ' . $currentPageData['previewId']);
+                return $currentPageData;
+            }
         }
         $this->getLogger()->warning('[ContentDataStore] No data set for current page');
         return null;
@@ -64,7 +66,7 @@ class FirstSpiritElementDataStore
      */
     public function setError(\Throwable $th)
     {
-        $this->sessionClient->setCurrentError($th);
+        $this->error = $th;
     }
 
     /**
@@ -75,6 +77,6 @@ class FirstSpiritElementDataStore
      */
     public function getError()
     {
-        return $this->sessionClient->getCurrentError();
+        return $this->error;
     }
 }
