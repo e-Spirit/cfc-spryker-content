@@ -27,7 +27,7 @@ class FirstSpiritContentFactory extends AbstractFactory
     public function __construct()
     {
         $this->previewService = new PreviewService($this);
-        $this->dataStore = new FirstSpiritElementDataStore($this->getSessionClient());
+        $this->dataStore = new FirstSpiritElementDataStore();
         $config = $this->getConfig();
         $apiHost = $config->getContentEndpointScript();
         $this->apiClient = new FrontendApiServerClient($apiHost);

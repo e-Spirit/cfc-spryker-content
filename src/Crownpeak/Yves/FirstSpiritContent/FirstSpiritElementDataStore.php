@@ -2,7 +2,6 @@
 
 namespace Crownpeak\Yves\FirstSpiritContent;
 
-use Crownpeak\Yves\FirstSpiritContent\Dependency\Client\SessionClientBridge;
 use Spryker\Shared\Log\LoggerTrait;
 
 /**
@@ -14,15 +13,6 @@ class FirstSpiritElementDataStore
 
     private mixed $currentPageData = null;
     private ?\Throwable $error = null;
-    private SessionClientBridge $sessionClient;
-
-
-
-    public function __construct(SessionClientBridge $sessionClient)
-    {
-        $this->sessionClient = $sessionClient;
-    }
-
 
     /**
      * Sets the FS data for the current page.
@@ -33,10 +23,10 @@ class FirstSpiritElementDataStore
     {
         if (empty($data) || is_null($data)) {
             $this->getLogger()->warning('[ContentDataStore] Setting empty result');
-            $this->sessionClient->setCurrentPage(null);
+            $this->currentPageData = null;
         } else {
             $this->getLogger()->debug('[ContentDataStore] Setting data for current page ' . $data['previewId']);
-            $this->sessionClient->setCurrentPage($data);
+            $this->currentPageData = $data;
         }
         $this->error = null;
     }
@@ -47,12 +37,9 @@ class FirstSpiritElementDataStore
      */
     public function getCurrentPage()
     {
-        if ($this->sessionClient->hasCurrentPage()) {
-            $currentPageData = $this->sessionClient->getCurrenPage();
-            if (!is_null($currentPageData)) {
-                $this->getLogger()->debug('[ContentDataStore] Getting data for current page ' . $currentPageData['previewId']);
-                return $currentPageData;
-            }
+        if (!is_null($this->currentPageData)) {
+            $this->getLogger()->debug('[ContentDataStore] Getting data for current page ' . $this->currentPageData['previewId']);
+            return $this->currentPageData;
         }
         $this->getLogger()->warning('[ContentDataStore] No data set for current page');
         return null;
