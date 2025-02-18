@@ -98,6 +98,9 @@ FCECOM.addHook('requestPreviewElement', (args) => {
       console.log('Failed to get URL', err);
     });
 });
+FCECOM.addHook('rerenderView', (args) => {
+  return location.reload();
+});
 
 // Overwrite default hook implementation to include disable()
 FCECOM.addHook('openStoreFrontUrl', (payload) => {
